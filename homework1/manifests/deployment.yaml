@@ -20,3 +20,4 @@ spec:
           name: service-hw1-container
           ports:
             - containerPort: 8000
+              name: web
