@@ -1,0 +1,59 @@
+version: "3.8"
+services:
+  web:
+    image: mrgreyves/nginx:0.1
+    container_name: web
+    depends_on:
+        - php
+    volumes:
+      - ./default.conf:/etc/nginx/sites-available/default
+      - ./default.conf:/etc/nginx/sites-enabled/default
+      - ./info.php:/var/www/info.php
+      - ./test.php:/var/www/test.php
+      - ./mysql.php:/var/www/mysql.php
+    ports:
+        - "80:80"
+    networks:
+      front_net:
+        ipv4_address: 10.20.30.10
+        aliases:
+          - web
+
+
+  php:
+    image: mrgreyves/php-fpm:0.1
+    volumes:
+      - ./info.php:/var/www/info.php
+      - ./test.php:/var/www/test.php
+      - ./mysql.php:/var/www/mysql.php
+    networks:
+      front_net:
+        aliases:
+          - php
+
+  not-db111:
+    image: mysql:5.7.28
+    container_name: not-db
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+    volumes:
+      - type: volume
+        source: db-data
+        target: /var/lib/mysql
+    networks:
+      front_net:
+        ipv4_address: 10.20.30.30
+        aliases:
+          - db
+          - not-db
+
+
+networks:
+  front_net:
+    ipam:
+      driver: default
+      config:
+        - subnet: "10.20.30.0/24"
+
+volumes:
+  db-data:

@@ -1,0 +1,6 @@
+"Основы кубернетес" - тест для самоконтроля
+https://docs.google.com/forms/d/1C6OaQk37y7HxOjN5quLFaR2VMOdMz8CfO62y397GOU8/edit
+
+otus/kubernetes qa at main · Zeka13/otus
+https://github.com/Zeka13/otus/tree/main/kubernetes%20qa
+

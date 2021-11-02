@@ -1,0 +1,6 @@
+—ервис-ориентированна€ архитектура (SOA)
+https://habr.com/ru/company/mailru/blog/342526/
+
+—крытые расходы при переходе на микросервисы
+https://blog.byndyu.ru/2020/12/blog-post.html
+

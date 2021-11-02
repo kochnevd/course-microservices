@@ -1,0 +1,18 @@
+apiVersion: cert-manager.io/v1
+kind: ClusterIssuer
+metadata:
+  name: letsencrypt-testing
+spec:
+  acme:
+    server: https://acme-v02.api.letsencrypt.org/directory
+    email: evgenii@anzu.io
+    privateKeySecretRef:
+      name: letsencrypt-anzu-testing
+    solvers:
+      - http01:
+          ingress:
+            class: nginx
+            podTemplate:
+              spec:
+                nodeSelector:
+                  "kubernetes.io/os": linux

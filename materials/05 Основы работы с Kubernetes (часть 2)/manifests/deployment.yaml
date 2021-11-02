@@ -1,0 +1,50 @@
+#apiVersion: v1
+#kind: Service
+#metadata:
+#  name: myapp
+#  namespace: testing
+#spec:
+#  #clusterIP: None 
+#  type: ClusterIP
+#  ports:
+#    - port: 777
+#      targetPort: 5678
+#  selector:
+#    app: myapp
+#---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: myapp
+  namespace: testing
+  labels:
+    app: myapp
+spec:
+  selector:
+    matchLabels:
+      app: myapp
+  replicas: 3
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  template:
+    metadata:
+      labels:
+        app: myapp
+    spec:
+      containers:            
+        - image: hashicorp/http-echo
+          args: ["-text=v1"]
+          name: supercontainer
+          ports:
+            - containerPort: 5678
+          
+#          imagePullPolicy: Always|IfNotPresent|Never
+#          readinessProbe:
+#            httpGet:
+#              path: /
+#              port: 5678
+#            initialDelaySeconds: 5
+#            periodSeconds: 20
