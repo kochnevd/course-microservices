@@ -1,0 +1,26 @@
+kubectl -n testing get replicasets
+
+kubectl -n testing describe replicasets feathersjs-565fb7bfc8
+
+kubectl -n testing get deployments
+
+
+
+----
+
+
+kubectl -n testing exec -ti feathersjs-565fb7bfc8-84mls -- /bin/sh
+kubectl -n testing logs feathersjs-565fb7bfc8-84mls
+
+
+----
+kubectl --namespace testing port-forward pod/feathersjs-565fb7bfc8-84mls 8080:3030
+kubectl --namespace testing port-forward service/feathersjs 8080:777
+
+
+----
+
+
+
+while sleep 1; do curl localhost:8080; done
+

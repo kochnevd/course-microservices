@@ -1,0 +1,10 @@
+ќсновы кубернетеса - заметки дл€ демо (сохранил в pdf)
+https://docs.google.com/document/d/1NckAgLT8jklq5d7nbfTvyZBXJcZMv2eKbRRvQheaeYU/edit?usp=sharing
+
+schetinnikov-otus/arch-labs
+https://github.com/schetinnikov-otus/arch-labs
+
+ћинимальные требовани€ к кубу
+https://kubernetes.io/docs/setup/production-environment/tools/kubeadm/install-kubeadm/#before-you-begin
+
+

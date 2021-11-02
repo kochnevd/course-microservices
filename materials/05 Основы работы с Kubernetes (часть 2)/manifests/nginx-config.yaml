@@ -1,0 +1,62 @@
+controller:
+  service:
+#    externalIPs:
+#      - XX.XX.XX.XX
+    externalTrafficPolicy: Local
+  tolerations:
+    - key: "role"
+      operator: "Equal"
+      value: "consolidated"
+      effect: "NoSchedule"
+  nodeSelector:
+    agentpool: consolidated
+  resources:
+    limits:
+      memory: 1Gi
+    requests:
+      cpu: 0.1
+      memory: 512Mi
+
+  autoscaling:
+    enabled: true
+    minReplicas: 1
+    maxReplicas: 2
+    targetCPUUtilizationPercentage: 48
+    targetMemoryUtilizationPercentage: 90
+
+#  metrics:
+#    enabled: true
+#    serviceMonitor:
+#      enabled: true
+#      additionalLabels:
+#        app: nginx
+#        release: anzu
+#      namespace: "monitoring"
+
+  extraInitContainers:
+  # Containers, which are run before the app containers are started.
+   - name: sysctl-buddy
+     image: busybox
+     securityContext:
+       privileged: true
+     command: ['sh', '-c', 'sysctl -w net.netfilter.nf_conntrack_max=262144']
+
+  config:
+    client-body-timeout: 5
+    client-header-timeout: 5
+    log-format-escape-json: "true"
+    log-format-upstream: '{
+    "timestamp": "$time_iso8601",
+    "remoteIp": "$remote_addr",
+    "requestID": "$req_id",
+    "proxyUpstreamName": "$proxy_upstream_name",
+    "ingressName": "$ingress_name",
+    "upstreamStatus": "$upstream_status",
+    "upstreamAddr": "$upstream_addr",
+    "requestUri": "$request_uri",
+    "httpRequest":{"requestMethod":
+    "$request_method", "requestUrl": "$host$request_uri", "status": $status,"requestSize":
+    "$request_length", "responseSize": "$upstream_response_length", "gzip_ratio": "$gzip_ratio",
+    "userAgent": "$http_user_agent", "referer": "$http_referer",
+    "accept-encoding": "$http_accept_encoding", "latency": "$upstream_response_time s",
+    "protocol":"$server_protocol"}}'

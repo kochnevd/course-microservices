@@ -1,0 +1,18 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: myapp
+  namespace: production
+  labels:
+    app: myapp
+spec:
+    ....
+    spec:
+      ....
+      dnsConfig:
+        options:
+          - name: ndots
+            value: "1"
+          - name: edns0
+      containers:
+        - image: mycompany.azurecr.io/myapp:production
