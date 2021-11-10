@@ -1,0 +1,7 @@
+Microservice Architecture
+Микросервисная архитектура
+Best Practice по разработке архитектуры программного обеспечения
+https://otus.ru/lessons/microservice-architecture/
+
+Мои курсы → Microservice Architecture
+https://otus.ru/learning/135518/
