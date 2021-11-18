@@ -1,0 +1,11 @@
+Презентация - Service mesh на примере Istio (сохранен в PDF)
+https://docs.google.com/presentation/d/1-eMsNsl5vEzLtnF-5YKBBDockI2bCxEgBEhyaynu8JI/edit#slide=id.g8baf0c4ca3_0_10387
+
+Конспект Service mesh на примере Istio (сохранен в PDF)
+https://docs.google.com/document/d/1171iNiZcYkoF995W4qvMATn1FcQ81ozQkTTFRc8fOEg/edit
+
+izhigalko/otus-demo-istio
+https://github.com/izhigalko/otus-demo-istio
+
+izhigalko/otus-homework-istio
+https://github.com/izhigalko/otus-homework-istio
