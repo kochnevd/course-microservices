@@ -7,6 +7,6 @@ spec:
   selector:
     app: app-hw1
   ports:
-    - port: 9000
+    - port: 80
       targetPort: web
   type: NodePort
