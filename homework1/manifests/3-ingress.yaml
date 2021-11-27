@@ -3,6 +3,8 @@ kind: Ingress
 metadata:
   name: hw1-ingress
   namespace: course-microservices
+  annotations:
+    kubernetes.io/ingress.class: nginx
 spec:
   rules:
     - host: arch.homework
