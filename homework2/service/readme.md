@@ -1,11 +1,11 @@
 #RESTful CRUD - Users service
 
 ## Локальные вызовы
-- Получить всех пользователей: http://localhost:8080/users
-- Получить одного пользователя: http://localhost:8080/users/1
+- Получить всех пользователей: http://localhost:8080/users (через Ingress: http://arch.homework/users)
+- Получить одного пользователя: http://localhost:8080/users/1 (через Ingress: http://arch.homework/users/1)
 
 ## H2 консоль (при использовании H2 Database): 
-http://localhost:8080/h2-console
+http://localhost:8080/h2-console (через Ingress: http://arch.homework/h2-console)
 Параметры окружения:
 - spring.datasource.url=jdbc:h2:mem:testdb
 - spring.datasource.driverClassName=org.h2.Driver

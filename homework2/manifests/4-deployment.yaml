@@ -1,0 +1,72 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: hw2-deployment
+  namespace: course-microservices
+  labels:
+    app: app-hw2
+spec:
+  selector:
+    matchLabels:
+      app: app-hw2
+  replicas: 2
+  template:
+    metadata:
+      labels:
+        app: app-hw2
+    spec:
+      containers:            
+        - image: kochnevd/course-microservices:service-hw2
+          name: service-hw2-container
+          env:
+            - name: SPRING_DATASOURCE_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: hw2-service-config
+                  key: jdbc-url
+            - name: SPRING_DATASOURCE_DRIVERCLASSNAME
+              valueFrom:
+                configMapKeyRef:
+                  name: hw2-service-config
+                  key: db-driver
+            - name: SPRING_JPA_DATABASE-PLATFORM
+              valueFrom:
+                configMapKeyRef:
+                  name: hw2-service-config
+                  key: db-platform
+            - name: SPRING_H2_CONSOLE_ENABLED
+              valueFrom:
+                configMapKeyRef:
+                  name: hw2-service-config
+                  key: h2-console-enabled
+            - name: SPRING_H2_CONSOLE_SETTINGS_WEB-ALLOW-OTHERS
+              value: "true"
+            - name: SPRING_H2_CONSOLE_SETTINGS_TCP-ALLOW-OTHERS
+              value: "true"
+
+            - name: SPRING_DATASOURCE_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: hw2-service-secret
+                  key: db-login
+            - name: SPRING_DATASOURCE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: hw2-service-secret
+                  key: db-password
+          ports:
+            - containerPort: 8080
+              name: web
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: web
+            initialDelaySeconds: 10
+            periodSeconds: 30
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: web
+            initialDelaySeconds: 10
+            periodSeconds: 15
+
