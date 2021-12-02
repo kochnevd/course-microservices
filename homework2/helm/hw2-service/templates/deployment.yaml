@@ -1,0 +1,71 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "hw2-service.fullname" . }}
+  labels:
+    {{- include "hw2-service.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "hw2-service.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "hw2-service.selectorLabels" . | nindent 8 }}
+    spec:
+      containers:
+        - name: {{ .Chart.Name }}
+          image: "{{ .Values.image.repository }}:{{ .Chart.AppVersion }}"
+          ports:
+            - name: web
+              containerPort: 8080
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: web
+            initialDelaySeconds: 10
+            periodSeconds: 30
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: web
+            initialDelaySeconds: 10
+            periodSeconds: 15
+          env:
+            - name: SPRING_DATASOURCE_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: hw2-service-config
+                  key: jdbc-url
+            - name: SPRING_DATASOURCE_DRIVERCLASSNAME
+              valueFrom:
+                configMapKeyRef:
+                  name: hw2-service-config
+                  key: db-driver
+            - name: SPRING_JPA_DATABASE-PLATFORM
+              valueFrom:
+                configMapKeyRef:
+                  name: hw2-service-config
+                  key: db-platform
+            - name: SPRING_H2_CONSOLE_ENABLED
+              valueFrom:
+                configMapKeyRef:
+                  name: hw2-service-config
+                  key: h2-console-enabled
+            - name: SPRING_H2_CONSOLE_SETTINGS_WEB-ALLOW-OTHERS
+              value: {{ .Values.externalDb.devMode }}
+            - name: SPRING_H2_CONSOLE_SETTINGS_TCP-ALLOW-OTHERS
+              value: {{ .Values.externalDb.devMode }}
+
+            - name: SPRING_DATASOURCE_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: hw2-service-secret
+                  key: db-login
+            - name: SPRING_DATASOURCE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: hw2-service-secret
+                  key: db-password
+
