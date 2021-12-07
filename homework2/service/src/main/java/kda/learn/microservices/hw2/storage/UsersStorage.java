@@ -15,4 +15,6 @@ public interface UsersStorage {
     boolean deleteUser(Long userId);
 
     List<UserData> getUsers();
+
+    void checkHealth();
 }
