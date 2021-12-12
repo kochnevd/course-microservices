@@ -8,15 +8,16 @@ import org.springframework.boot.actuate.health.HealthIndicator;
 import org.springframework.stereotype.Component;
 
 @Component
-public class MyStorageHealthIndicator implements HealthIndicator {
+public class StorageHealthIndicator implements HealthIndicator {
 
-    private static final Logger log = LoggerFactory.getLogger(MyStorageHealthIndicator.class);
+    private static final Logger log = LoggerFactory.getLogger(StorageHealthIndicator.class);
 
     private final UsersStorage storage;
     private Boolean lastHealthState;
 
-    public MyStorageHealthIndicator(UsersStorage storage) {
+    public StorageHealthIndicator(UsersStorage storage) {
         this.storage = storage;
+        log.info("StorageHealthIndicator created");
     }
 
     @Override
