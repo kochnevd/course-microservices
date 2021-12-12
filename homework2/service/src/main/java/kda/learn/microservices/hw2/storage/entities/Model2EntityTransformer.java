@@ -11,7 +11,7 @@ public class Model2EntityTransformer {
 
         return new User()
                 .setId(userData.getId())
-                .setUsername(userData.getUsername())
+                .setUserName(userData.getUsername())
                 .setFirstName(userData.getFirstName())
                 .setLastName(userData.getLastName())
                 .setEmail(userData.getEmail())
@@ -24,7 +24,7 @@ public class Model2EntityTransformer {
 
         return new UserData()
                 .setId(user.getId())
-                .setUsername(user.getUsername())
+                .setUsername(user.getUserName())
                 .setFirstName(user.getFirstName())
                 .setLastName(user.getLastName())
                 .setEmail(user.getEmail())
