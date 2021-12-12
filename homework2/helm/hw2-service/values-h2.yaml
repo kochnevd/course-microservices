@@ -18,10 +18,10 @@ ingress:
           pathType: Prefix
 
 externalDb:
-  dbUrl: "jdbc:postgresql://postgres:5432/myapp"
-  dbDriver: "org.postgresql.Driver"
-  dbPlatform: "org.hibernate.dialect.PostgreSQLDialect"
-  dbUser: "dXNy"
-  dbPassword: "MTIz"
+  dbUrl: "jdbc:h2:mem:testdb"
+  dbDriver: "org.h2.Driver"
+  dbPlatform: "org.hibernate.dialect.H2Dialect"
+  dbUser: "c2E="
+  dbPassword: ''''''
   devMode: '"true"'
 
