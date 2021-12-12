@@ -4,10 +4,10 @@ metadata:
   namespace: course-microservices
   name: hw2-service-config
 data:
-  jdbc-url: jdbc:h2:mem:testdb
-  db-driver: org.h2.Driver
-  db-platform: org.hibernate.dialect.H2Dialect
-  h2-console-enabled: "true"
+  db-name: myapp
+  jdbc-url: jdbc:postgresql://postgres:5432/myapp
+  db-driver: org.postgresql.Driver
+  db-platform: org.hibernate.dialect.PostgreSQLDialect
 ---
 apiVersion: v1
 kind: Secret
@@ -16,5 +16,5 @@ metadata:
   name: hw2-service-secret
 type: Opaque
 data:
-  db-login: c2E=
-  db-password: ''
+  db-login: dXNy
+  db-password: MTIz
