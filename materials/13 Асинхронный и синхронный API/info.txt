@@ -1,0 +1,6 @@
+Манифест Реактивных Систем
+https://www.reactivemanifesto.org/ru
+
+schetinnikov-otus/arch-labs
+https://github.com/schetinnikov-otus/arch-labs/tree/master/api-spec
+

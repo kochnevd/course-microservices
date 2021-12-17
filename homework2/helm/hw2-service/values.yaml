@@ -1,0 +1,26 @@
+replicaCount: 2
+
+image:
+  repository: kochnevd/course-microservices
+
+service:
+  type: NodePort
+  port: 80
+
+ingress:
+  enabled: true
+  annotations:
+    kubernetes.io/ingress.class: nginx
+  hosts:
+    - host: arch.homework
+      paths:
+        - path: /
+          pathType: Prefix
+
+externalDb:
+  dbName: "myapp"
+  dbUrl: "jdbc:postgresql://postgres:5432/myapp"
+  dbDriver: "org.postgresql.Driver"
+  dbPlatform: "org.hibernate.dialect.PostgreSQLDialect"
+  dbUser: "dXNy"
+  dbPassword: "MTIz"

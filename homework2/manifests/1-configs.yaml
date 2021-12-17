@@ -1,0 +1,20 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  namespace: course-microservices
+  name: hw2-service-config
+data:
+  db-name: myapp
+  jdbc-url: jdbc:postgresql://postgres:5432/myapp
+  db-driver: org.postgresql.Driver
+  db-platform: org.hibernate.dialect.PostgreSQLDialect
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  namespace: course-microservices
+  name: hw2-service-secret
+type: Opaque
+data:
+  db-login: dXNy
+  db-password: MTIz
