@@ -3,10 +3,10 @@ kind: ConfigMap
 metadata:
   name: hw2-service-config
 data:
+  db-name: {{ .Values.externalDb.dbName }}
   jdbc-url: {{ .Values.externalDb.dbUrl }}
   db-driver: {{ .Values.externalDb.dbDriver }}
   db-platform: {{ .Values.externalDb.dbPlatform }}
-  h2-console-enabled: {{ .Values.externalDb.devMode }}
 ---
 apiVersion: v1
 kind: Secret

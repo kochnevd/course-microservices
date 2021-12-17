@@ -21,7 +21,10 @@ spec:
           name: postgredb
         env:
           - name: POSTGRES_DB
-            value: myapp
+            valueFrom:
+              configMapKeyRef:
+                name: hw2-service-config
+                key: db-name
           - name: POSTGRES_USER
             valueFrom:
               secretKeyRef:
@@ -31,7 +34,7 @@ spec:
             valueFrom:
               secretKeyRef:
                 name: hw2-service-secret
-                key: db-login
+                key: db-password
         volumeMounts:
         - name: postgredb
           mountPath: /var/lib/postgresql/data

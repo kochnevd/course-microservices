@@ -37,10 +37,6 @@ spec:
                 configMapKeyRef:
                   name: hw2-service-config
                   key: db-platform
-            - name: SPRING_H2_CONSOLE_SETTINGS_WEB-ALLOW-OTHERS
-              value: "true"
-            - name: SPRING_H2_CONSOLE_SETTINGS_TCP-ALLOW-OTHERS
-              value: "true"
             - name: MANAGEMENT_ENDPOINT_HEALTH_SHOW-COMPONENTS
               value: always
 

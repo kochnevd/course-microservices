@@ -18,10 +18,9 @@ ingress:
           pathType: Prefix
 
 externalDb:
+  dbName: "myapp"
   dbUrl: "jdbc:postgresql://postgres:5432/myapp"
   dbDriver: "org.postgresql.Driver"
   dbPlatform: "org.hibernate.dialect.PostgreSQLDialect"
   dbUser: "dXNy"
   dbPassword: "MTIz"
-  devMode: '"true"'
-

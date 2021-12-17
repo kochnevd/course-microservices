@@ -14,9 +14,14 @@ spec:
       labels:
         {{- include "hw2-service.selectorLabels" . | nindent 8 }}
     spec:
+      initContainers:
+        - name: {{ .Chart.Name }}-init
+          image: busybox:1.28
+          command: ['sh', '-c', "until nslookup postgres.$(cat /var/run/secrets/kubernetes.io/serviceaccount/namespace).svc.cluster.local; do echo waiting for postgres; sleep 2; done; sleep 10"]
       containers:
         - name: {{ .Chart.Name }}
           image: "{{ .Values.image.repository }}:{{ .Chart.AppVersion }}"
+          imagePullPolicy: Always
           ports:
             - name: web
               containerPort: 8080
@@ -28,11 +33,13 @@ spec:
             periodSeconds: 30
           readinessProbe:
             httpGet:
-              path: /health
+              path: /actuator/health/storage
               port: web
             initialDelaySeconds: 10
             periodSeconds: 15
           env:
+            - name: SPRING_PROFILES_ACTIVE
+              value: PROM
             - name: SPRING_DATASOURCE_URL
               valueFrom:
                 configMapKeyRef:
@@ -48,15 +55,8 @@ spec:
                 configMapKeyRef:
                   name: hw2-service-config
                   key: db-platform
-            - name: SPRING_H2_CONSOLE_ENABLED
-              valueFrom:
-                configMapKeyRef:
-                  name: hw2-service-config
-                  key: h2-console-enabled
-            - name: SPRING_H2_CONSOLE_SETTINGS_WEB-ALLOW-OTHERS
-              value: {{ .Values.externalDb.devMode }}
-            - name: SPRING_H2_CONSOLE_SETTINGS_TCP-ALLOW-OTHERS
-              value: {{ .Values.externalDb.devMode }}
+            - name: MANAGEMENT_ENDPOINT_HEALTH_SHOW-COMPONENTS
+              value: always
 
             - name: SPRING_DATASOURCE_USERNAME
               valueFrom:
