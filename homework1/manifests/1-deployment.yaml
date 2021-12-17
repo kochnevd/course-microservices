@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: hw1-deployment
+  namespace: course-microservices
+  labels:
+    app: app-hw1
+spec:
+  selector:
+    matchLabels:
+      app: app-hw1
+  replicas: 2
+  template:
+    metadata:
+      labels:
+        app: app-hw1
+    spec:
+      containers:            
+        - image: kochnevd/course-microservices:service-hw1
+          name: service-hw1-container
+          ports:
+            - containerPort: 8000
+              name: web
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: web
+            initialDelaySeconds: 10
+            periodSeconds: 30
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: web
+            initialDelaySeconds: 10
+            periodSeconds: 15
+

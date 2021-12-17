@@ -1,4 +1,4 @@
-Prometheus. Grafana. (ρκΰχΰν β PDF)
+Prometheus. Grafana. (Π΅ΠΊΠ°Ρ‡Π°Π½ Π² PDF)
 https://docs.google.com/document/d/1mtcoHMheUKbv9n_eARTqt9eNsySN4_Xmp85B6ia8_J8/edit
 
 schetinnikov-otus/arch-labs
