@@ -1,0 +1,18 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: hw2-service-config
+data:
+  db-name: {{ .Values.externalDb.dbName }}
+  jdbc-url: {{ .Values.externalDb.dbUrl }}
+  db-driver: {{ .Values.externalDb.dbDriver }}
+  db-platform: {{ .Values.externalDb.dbPlatform }}
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: hw2-service-secret
+type: Opaque
+data:
+  db-login: {{ .Values.externalDb.dbUser }}
+  db-password: {{ .Values.externalDb.dbPassword }}

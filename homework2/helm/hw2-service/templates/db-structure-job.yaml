@@ -1,0 +1,40 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+    name: psql-db-structure-job
+spec:
+    backoffLimit: 0
+    template:
+        spec:
+            restartPolicy: Never
+            initContainers:
+                - name: psql-container-init
+                  image: busybox:1.28
+                  command: ['sh', '-c', "until nslookup postgres.$(cat /var/run/secrets/kubernetes.io/serviceaccount/namespace).svc.cluster.local; do echo waiting for postgres; sleep 2; done; sleep 30"]
+            containers:
+                - image: jbergknoff/postgresql-client
+                  imagePullPolicy: IfNotPresent
+                  name: psql-container
+                  terminationMessagePolicy: FallbackToLogsOnError
+                  env:
+                      - name: PGHOST
+                        value: postgres
+                      - name: PGPORT
+                        value: '5432'
+                      - name: PGDATABASE
+                        valueFrom:
+                            configMapKeyRef:
+                                name: hw2-service-config
+                                key: db-name
+                      - name: PGUSER
+                        valueFrom:
+                            secretKeyRef:
+                                name: hw2-service-secret
+                                key: db-login
+                      - name: PGPASSWORD
+                        valueFrom:
+                            secretKeyRef:
+                                name: hw2-service-secret
+                                key: db-password
+                  command: [ "/bin/sh", "-c", "--" ]
+                  args: [ 'psql --command="CREATE TABLE IF NOT EXISTS Users (id SERIAL,user_name varchar(40),first_name varchar(40),last_name varchar(40),email varchar(40),phone varchar(40));"' ]
