@@ -39,6 +39,12 @@ spec:
                   key: db-platform
             - name: MANAGEMENT_ENDPOINT_HEALTH_SHOW-COMPONENTS
               value: always
+            - name: MANAGEMENT_ENDPOINTS_WEB_EXPOSURE_INCLUDE
+              value: health,prometheus
+            - name: MANAGEMENT_METRICS_EXPORT_PROMETHEUS_ENABLED
+              value: "true"
+            #- name: MANAGEMENT_METRICS_DISTRIBUTION_PERCENTILES-HISTOGRAM_HTTP_SERVER_REQUESTS
+            #  value: "true"
 
             - name: SPRING_DATASOURCE_USERNAME
               valueFrom:
