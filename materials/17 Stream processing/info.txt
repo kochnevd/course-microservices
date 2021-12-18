@@ -1,0 +1,2 @@
+arch-labs/stream-processing at master · schetinnikov-otus/arch-labs
+https://github.com/schetinnikov-otus/arch-labs/tree/master/stream-processing

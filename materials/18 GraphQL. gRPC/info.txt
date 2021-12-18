@@ -1,0 +1,2 @@
+Демо
+https://github.com/izhigalko/otus-demo-graphql
