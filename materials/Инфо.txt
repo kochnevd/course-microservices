@@ -5,3 +5,25 @@ https://otus.ru/lessons/microservice-architecture/
 
 Мои курсы → Microservice Architecture
 https://otus.ru/learning/135518/
+
+Содержание
+01 Плюсы и минусы микросервисной архитектуры
+02 Основы работы с Docker
+03 Инфраструктурные паттерны
+04 Основы работы с Kubernetes (часть 1)
+05 Основы работы с Kubernetes (часть 2)		(+) ДЗ минимальный сервис Kubernetes
+06 Основы работы с Kubernetes (часть 3)		(+) ДЗ Kubernetes RESTful CRUD
+07 Kubernetes. QA
+08 Мониторинг и алертинг
+09 Prometheus. Grafana				ДЗ дашборд в Графане
+10 Service mesh					ДЗ настроить балансировку трафика
+11 Авторизация и аутентификация
+12 API gateway					ДЗ аутентификацию и регистрацию пользователей
+13 Асинхронный и синхронный API
+14 Event Driven Architecture
+15 Rabbit Kafka
+16 Консультация по проектам и ДЗ		ДЗ тема проекта
+17 Stream processing				ДЗ три сервиса
+18 GraphQL. gRPC
+19 RESTful
+20 Идемпотетность и коммутативность API		ДЗ сервис "Заказ" с идемпотетным методом
