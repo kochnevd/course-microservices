@@ -1,3 +1,4 @@
+```mermaid
 sequenceDiagram
 
 participant Пользователь
@@ -30,3 +31,4 @@ activate Сервис заказа
 deactivate Сервис заказа
     Сервис нотификаций->>Сервис нотификаций: sending email
 deactivate Сервис нотификаций
+```
