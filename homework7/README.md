@@ -43,3 +43,8 @@
 - наличие `{{baseUrl}}` для урла
 - использование домена `arch.homework` в качестве **initial** значения `{{baseUrl}}`
 - отображение данных запроса и данных ответа при запуске из командной строки с помощью newman.
+
+## Полезные ссылки
+- "[Примеры IDL и диаграмм от авторов ДЗ](https://github.com/schetinnikov-otus/arch-labs/tree/master/api-spec)"
+- "[Mermaid](https://github.com/mermaid-js/mermaid)" - diagramming and charting tool
+- "[Mermaid Live Editor](https://mermaid-js.github.io/)"
