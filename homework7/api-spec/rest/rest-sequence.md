@@ -18,10 +18,23 @@ User->>+OrderService: POST /order {cost}
     Note right of User: создание заказа
     
     OrderService->>+BillingService: POST /debit {sum}
-    BillingService-->>-OrderService: 202 ACCEPTED
+        Note right of OrderService: списание денег
+    alt Списание успешно
+        BillingService-->>OrderService: 202 ACCEPTED
+    else Списание не прошло
+        BillingService-->>OrderService: 402 Payment Required
+    end
+    deactivate BillingService
     
     OrderService->>+NotificationService: POST /send_email {orderResult}
     NotificationService-->>OrderService: 202 ACCEPTED
-OrderService-->>-User: 201 CREATED
+
+alt Списание успешно
+    OrderService-->>User: 201 CREATED
+else Списание не прошло
+    OrderService-->>User: 402 Payment Required
+end
+deactivate OrderService
+
     NotificationService->>-NotificationService: sending email
 ```
