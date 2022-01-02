@@ -1,34 +1,27 @@
 ```mermaid
 sequenceDiagram
 
-participant Пользователь
-participant Сервис заказа
-participant Сервис биллинга
-participant Сервис нотификаций
+actor User as Пользователь
+participant OrderService as Сервис заказа
+participant BillingService as Сервис биллинга
+participant NotificationService as Сервис нотификаций
 
-Пользователь->>Сервис заказа: POST /users
-activate Сервис заказа
-    Note right of Пользователь: создание пользователя
-    Сервис заказа->>Сервис биллинга: POST /accounts
-    activate Сервис биллинга
-        Note right of Сервис заказа: создание аккаунта
-        Сервис биллинга-->>Сервис заказа: 201 CREATED {accountId}
-    deactivate Сервис биллинга
-    Сервис заказа-->>Пользователь: 201 CREATED
-deactivate Сервис заказа
+User->>+OrderService: POST /users
+    Note right of User: создание пользователя
+    
+    OrderService->>+BillingService: POST /accounts
+        Note right of OrderService: создание аккаунта
+    BillingService-->>-OrderService: 201 CREATED {accountId}
+OrderService-->>-User: 201 CREATED
 
-Пользователь->>Сервис заказа: POST /order {cost}
-activate Сервис заказа
-    Note right of Пользователь: создание заказа
-    Сервис заказа->>Сервис биллинга: POST /debit {sum}
-    activate Сервис биллинга
-        Сервис биллинга-->>Сервис заказа: 202 ACCEPTED
-    deactivate Сервис биллинга
-    Сервис заказа->>Сервис нотификаций: POST /send_email
-    activate Сервис нотификаций
-        Сервис нотификаций-->>Сервис заказа: 202 ACCEPTED
-    Сервис заказа-->>Пользователь: 201 CREATED
-deactivate Сервис заказа
-    Сервис нотификаций->>Сервис нотификаций: sending email
-deactivate Сервис нотификаций
+User->>+OrderService: POST /order {cost}
+    Note right of User: создание заказа
+    
+    OrderService->>+BillingService: POST /debit {sum}
+    BillingService-->>-OrderService: 202 ACCEPTED
+    
+    OrderService->>+NotificationService: POST /send_email {orderResult}
+    NotificationService-->>OrderService: 202 ACCEPTED
+OrderService-->>-User: 201 CREATED
+    NotificationService->>-NotificationService: sending email
 ```
