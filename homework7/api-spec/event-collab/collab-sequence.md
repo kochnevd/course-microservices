@@ -19,6 +19,17 @@ User->>+Gateway: POST /users
     Message broker-->>Gateway: consume
 Gateway-->>-User: 201 CREATED
 
+User->>+Gateway: POST /deposit {sum}
+    Gateway-)Message broker: publish
+    Note right of Gateway: DepositRequested {sum}
+
+    Message broker-->>BillingService: consume
+    BillingService-)Message broker: publish
+    Note left of BillingService: DepositAccepted
+
+    Message broker-->>Gateway: consume
+Gateway-->>-User: 202 ACCEPTED
+
 User->>+Gateway: POST /order {cost}
     Gateway-)Message broker: publish
     Note right of Gateway: CreateOrderRequested

@@ -15,6 +15,10 @@ User->>+OrderService: POST /user
     BillingService-->>-OrderService: 201 CREATED {accountId}
 OrderService-->>-User: 201 CREATED
 
+User->>+BillingService: POST /deposit {sum}
+    Note right of User: взнос денег
+BillingService-->>-User: 202 ACCEPTED
+
 User->>+OrderService: POST /order {cost}
     Note right of User: создание заказа
 
