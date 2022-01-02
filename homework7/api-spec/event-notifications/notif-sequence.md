@@ -7,10 +7,10 @@ participant BillingService as Сервис биллинга
 participant Message broker
 participant NotificationService as Сервис нотификаций
 
-User->>+OrderService: POST /users
+User->>+OrderService: POST /user
     Note right of User: создание пользователя
     
-    OrderService->>+BillingService: POST /accounts
+    OrderService->>+BillingService: POST /account
         Note right of OrderService: создание аккаунта
     BillingService-->>-OrderService: 201 CREATED {accountId}
 OrderService-->>-User: 201 CREATED

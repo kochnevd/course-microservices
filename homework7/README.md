@@ -47,4 +47,5 @@
 ## Полезные ссылки
 - "[Примеры IDL и диаграмм от авторов ДЗ](https://github.com/schetinnikov-otus/arch-labs/tree/master/api-spec)"
 - "[Mermaid](https://github.com/mermaid-js/mermaid)" - diagramming and charting tool
-- "[Mermaid Live Editor](https://mermaid-js.github.io/)"
+- "[Mermaid Live Editor](https://mermaid-js.github.io/mermaid-live-editor/)"
+- [Swagger Editor](https://editor.swagger.io/)
