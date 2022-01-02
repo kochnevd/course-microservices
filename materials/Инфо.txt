@@ -23,7 +23,7 @@ https://otus.ru/learning/135518/
 14 Event Driven Architecture
 15 Rabbit Kafka
 16 Консультация по проектам и ДЗ		ДЗ тема проекта
-17 Stream processing				ДЗ три сервиса
+17 Stream processing				(+-) ДЗ три сервиса
 18 GraphQL. gRPC
 19 RESTful
 20 Идемпотетность и коммутативность API		ДЗ сервис "Заказ" с идемпотетным методом
