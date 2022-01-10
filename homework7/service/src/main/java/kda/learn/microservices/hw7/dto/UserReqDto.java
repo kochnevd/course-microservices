@@ -34,10 +34,6 @@ public class UserReqDto {
     return login;
   }
 
-  public void setLogin(String login) {
-    this.login = login;
-  }
-
   public UserReqDto firstName(String firstName) {
     this.firstName = firstName;
     return this;
@@ -49,10 +45,6 @@ public class UserReqDto {
    **/
   public String getFirstName() {
     return firstName;
-  }
-
-  public void setFirstName(String firstName) {
-    this.firstName = firstName;
   }
 
   public UserReqDto lastName(String lastName) {
@@ -68,10 +60,6 @@ public class UserReqDto {
     return lastName;
   }
 
-  public void setLastName(String lastName) {
-    this.lastName = lastName;
-  }
-
   public UserReqDto email(String email) {
     this.email = email;
     return this;
@@ -83,10 +71,6 @@ public class UserReqDto {
    **/
   public String getEmail() {
     return email;
-  }
-
-  public void setEmail(String email) {
-    this.email = email;
   }
 
 

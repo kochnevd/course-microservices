@@ -7,7 +7,7 @@ import javax.persistence.*;
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+    private Long id;
 
     @Column
     private String login;
@@ -21,7 +21,7 @@ public class User {
     @Column
     private String email;
 
-    public Integer getId() {
+    public Long getId() {
         return id;
     }
 

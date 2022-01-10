@@ -9,19 +9,19 @@ import javax.persistence.*;
 public class Account {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+    private Long id;
 
     @Column(name = "user_id")
-    private Integer userId;
+    private Long userId;
 
     @Column
     private BigDecimal balance = BigDecimal.ZERO;
 
-    public Integer getId() {
+    public Long getId() {
         return id;
     }
 
-    public Integer getUserId() {
+    public Long getUserId() {
         return userId;
     }
 
@@ -29,7 +29,7 @@ public class Account {
         return balance;
     }
 
-    public Account setUserId(Integer userId) {
+    public Account setUserId(Long userId) {
         this.userId = userId;
         return this;
     }

@@ -12,7 +12,7 @@ import org.springframework.validation.annotation.Validated;
 @Validated
 public class OrderReqDto {
   @JsonProperty("userId")
-  private Integer userId = null;
+  private Long userId = null;
 
   @JsonProperty("cost")
   private BigDecimal cost = null;
@@ -20,7 +20,7 @@ public class OrderReqDto {
   @JsonProperty("orderContent")
   private String orderContent = null;
 
-  public OrderReqDto userId(Integer userId) {
+  public OrderReqDto userId(Long userId) {
     this.userId = userId;
     return this;
   }
@@ -29,12 +29,8 @@ public class OrderReqDto {
    * Get userId
    * @return userId
    **/
-  public Integer getUserId() {
+  public Long getUserId() {
     return userId;
-  }
-
-  public void setUserId(Integer userId) {
-    this.userId = userId;
   }
 
   public OrderReqDto cost(BigDecimal cost) {
@@ -50,10 +46,6 @@ public class OrderReqDto {
     return cost;
   }
 
-  public void setCost(BigDecimal cost) {
-    this.cost = cost;
-  }
-
   public OrderReqDto orderContent(String orderContent) {
     this.orderContent = orderContent;
     return this;
@@ -66,11 +58,6 @@ public class OrderReqDto {
   public String getOrderContent() {
     return orderContent;
   }
-
-  public void setOrderContent(String orderContent) {
-    this.orderContent = orderContent;
-  }
-
 
   @Override
   public boolean equals(java.lang.Object o) {

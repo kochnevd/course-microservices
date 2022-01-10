@@ -12,12 +12,12 @@ import org.springframework.validation.annotation.Validated;
 @Validated
 public class DebitReqDto {
   @JsonProperty("accountId")
-  private Integer accountId = null;
+  private Long accountId = null;
 
   @JsonProperty("sum")
   private BigDecimal sum = null;
 
-  public DebitReqDto accountId(Integer accountId) {
+  public DebitReqDto accountId(Long accountId) {
     this.accountId = accountId;
     return this;
   }
@@ -26,12 +26,8 @@ public class DebitReqDto {
    * Get accountId
    * @return accountId
    **/
-  public Integer getAccountId() {
+  public Long getAccountId() {
     return accountId;
-  }
-
-  public void setAccountId(Integer accountId) {
-    this.accountId = accountId;
   }
 
   public DebitReqDto sum(BigDecimal sum) {
@@ -46,11 +42,6 @@ public class DebitReqDto {
   public BigDecimal getSum() {
     return sum;
   }
-
-  public void setSum(BigDecimal sum) {
-    this.sum = sum;
-  }
-
 
   @Override
   public boolean equals(java.lang.Object o) {

@@ -27,7 +27,7 @@ public class Storage {
         return usersRepository.save(user);
     }
 
-    public void createAccount(Integer userId) {
+    public void createAccount(Long userId) {
         accountsCRUDRepository.save(
                 new Account()
                         .setUserId(userId)
@@ -38,12 +38,12 @@ public class Storage {
         return ordersRepository.save(order);
     }
 
-    public boolean debitAccount(long userId, BigDecimal sum) {
+    public boolean debitAccount(Long userId, BigDecimal sum) {
         var account = StreamSupport.stream(
                     accountsCRUDRepository
                     .findAll()
                     .spliterator(), false)
-                .filter(acc -> acc.getUserId() == userId)
+                .filter(acc -> acc.getUserId().equals(userId))
                 .findAny()
                 .orElse(null);
         if (account == null) {
@@ -60,6 +60,17 @@ public class Storage {
             accountsCRUDRepository.save(account);
             return true;
         }
+    }
+
+    public boolean depositAccount(Long accountId, BigDecimal sum) {
+        var account = accountsCRUDRepository.findById(accountId).orElse(null);
+        if (account == null) return false;
+
+        double balance = account.getBalance().doubleValue();
+        account.setBalance(BigDecimal.valueOf(balance + sum.doubleValue()));
+        accountsCRUDRepository.save(account);
+
+        return true;
     }
 
     public List<Account> getAccounts() {

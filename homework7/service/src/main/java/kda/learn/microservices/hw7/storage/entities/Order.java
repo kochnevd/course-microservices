@@ -9,10 +9,10 @@ import javax.persistence.*;
 public class Order {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+    private Long id;
 
     @Column(name = "user_id")
-    private Integer userId;
+    private Long userId;
 
     @Column(name = "order_content")
     private String orderContent;
@@ -20,7 +20,7 @@ public class Order {
     @Column
     private BigDecimal cost;
 
-    public Integer getId() {
+    public Long getId() {
         return id;
     }
 
@@ -28,11 +28,11 @@ public class Order {
         return cost;
     }
 
-    public Integer getUserId() {
+    public Long getUserId() {
         return userId;
     }
 
-    public Order setUserId(Integer userId) {
+    public Order setUserId(Long userId) {
         this.userId = userId;
         return this;
     }

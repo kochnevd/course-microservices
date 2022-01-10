@@ -36,7 +36,8 @@ public class BillingController {
     @PostMapping(value = "/deposit")
     public ResponseEntity<Void> depositAccount(@RequestBody DepositReqDto depositReqDto) {
         log.info("CALL: depositAccount");
-        return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
+        service.depositAccount(depositReqDto.getAccountId(), depositReqDto.getSum());
+        return new ResponseEntity<>(HttpStatus.ACCEPTED);
     }
 
     @PostMapping(value = "/debit")

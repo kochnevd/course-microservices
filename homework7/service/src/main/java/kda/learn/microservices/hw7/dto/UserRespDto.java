@@ -10,9 +10,9 @@ import org.springframework.validation.annotation.Validated;
 @Validated
 public class UserRespDto {
     @JsonProperty("id")
-    private Integer id = null;
+    private Long id = null;
 
-    public UserRespDto id(Integer id) {
+    public UserRespDto id(Long id) {
         this.id = id;
         return this;
     }
@@ -21,14 +21,9 @@ public class UserRespDto {
      * Get id
      * @return id
      **/
-    public Integer getId() {
+    public Long getId() {
         return id;
     }
-
-    public void setId(Integer id) {
-        this.id = id;
-    }
-
 
     @Override
     public boolean equals(java.lang.Object o) {
