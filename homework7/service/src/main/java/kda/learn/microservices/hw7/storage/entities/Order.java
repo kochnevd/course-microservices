@@ -28,6 +28,10 @@ public class Order {
         return cost;
     }
 
+    public String getOrderContent() {
+        return orderContent;
+    }
+
     public Long getUserId() {
         return userId;
     }

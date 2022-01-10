@@ -21,8 +21,23 @@ public class User {
     @Column
     private String email;
 
+    @Column(name = "account_id")
+    private Long accountId;
+
     public Long getId() {
         return id;
+    }
+
+    public String getLogin() {
+        return login;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public Long getAccountId() {
+        return accountId;
     }
 
     public User setLogin(String login) {
@@ -42,6 +57,11 @@ public class User {
 
     public User setEmail(String email) {
         this.email = email;
+        return this;
+    }
+
+    public User accountId(Long accountId) {
+        this.accountId = accountId;
         return this;
     }
 }

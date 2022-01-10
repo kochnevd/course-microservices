@@ -4,7 +4,6 @@ import kda.learn.microservices.hw7.dto.MessageReqDto;
 import kda.learn.microservices.hw7.services.NotificationService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -19,6 +18,7 @@ import java.util.List;
 @Validated
 @RequestMapping("/")
 public class NotificationsController {
+//TODO: вынести в отдельный микросервис
     private static final Logger log = LoggerFactory.getLogger(OrdersController.class);
 
     private final NotificationService service;

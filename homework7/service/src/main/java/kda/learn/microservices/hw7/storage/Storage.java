@@ -27,25 +27,23 @@ public class Storage {
         return usersRepository.save(user);
     }
 
-    public void createAccount(Long userId) {
-        accountsCRUDRepository.save(
+    public Long createAccount(Long userId) {
+        return accountsCRUDRepository.save(
                 new Account()
                         .setUserId(userId)
-        );
+        ).getId();
     }
 
     public Order createOrder(Order order) {
         return ordersRepository.save(order);
     }
 
-    public boolean debitAccount(Long userId, BigDecimal sum) {
-        var account = StreamSupport.stream(
-                    accountsCRUDRepository
-                    .findAll()
-                    .spliterator(), false)
-                .filter(acc -> acc.getUserId().equals(userId))
-                .findAny()
-                .orElse(null);
+    public void updateUser(User user) {
+        usersRepository.save(user);
+    }
+
+    public boolean debitAccount(Long accountId, BigDecimal sum) {
+        var account = accountsCRUDRepository.findById(accountId).orElse(null);
         if (account == null) {
             // аккаунт не существует
             return false;
@@ -77,5 +75,9 @@ public class Storage {
         return StreamSupport
                 .stream(accountsCRUDRepository.findAll().spliterator(), false)
                 .collect(Collectors.toList());
+    }
+
+    public User getUser(Long userId) {
+        return usersRepository.findById(userId).orElse(null);
     }
 }

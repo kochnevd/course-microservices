@@ -10,23 +10,34 @@ import org.springframework.stereotype.Service;
 public class OrdersService {
 
     private final Storage storage;
+    private final NotificationService notificationService;
     private final BillingService billingService;
 
-    public OrdersService(Storage storage, BillingService billingService) {
+    public OrdersService(Storage storage, NotificationService notificationService, BillingService billingService) {
         this.storage = storage;
+        this.notificationService = notificationService;
         this.billingService = billingService;
     }
 
     public User createUser(User user) {
         User newUser = storage.createUser(user);
-        billingService.createAccount(newUser.getId());
+        var accountId = billingService.createAccount(newUser.getId());
+        newUser.accountId(accountId);
+        storage.updateUser(newUser);
         return newUser;
     }
 
     public Order createOrder(Order order) {
-        if (billingService.debitAccount(order.getUserId(), order.getCost()))
-            return storage.createOrder(order);
+        User user = storage.getUser(order.getUserId());
 
-        throw new BillingPaymentFailedException("Не удалось списать деньги со счета");
+        if (billingService.debitAccount(user.getAccountId(), order.getCost())) {
+            notificationService.sendMessage(user.getEmail(),
+                    String.format("Успешный заказ для пользователя '%s' на сумму %s: %s", user.getLogin(), order.getCost(), order.getOrderContent()));
+            return storage.createOrder(order);
+        } else {
+            notificationService.sendMessage(user.getEmail(),
+                    String.format("Не удалось оформить заказ для пользователя '%s' на сумму %s: платеж не прошел", user.getLogin(), order.getCost()));
+            throw new BillingPaymentFailedException("Не удалось списать деньги со счета");
+        }
     }
 }

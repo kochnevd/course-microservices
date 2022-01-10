@@ -21,12 +21,12 @@ public class BillingService {
         return storage.getAccounts();
     }
 
-    public void createAccount(Long userId) {
-        storage.createAccount(userId);
+    public Long createAccount(Long userId) {
+        return storage.createAccount(userId);
     }
 
-    public boolean debitAccount(Long userId, BigDecimal sum) {
-        return storage.debitAccount(userId, sum);
+    public boolean debitAccount(Long accountId, BigDecimal sum) {
+        return storage.debitAccount(accountId, sum);
     }
 
     public void depositAccount(Long accountId, BigDecimal sum) {
