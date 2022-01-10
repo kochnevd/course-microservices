@@ -9,20 +9,20 @@ import org.springframework.validation.annotation.Validated;
  */
 @Validated
 public class AccountRespDto {
-    @JsonProperty("accountId")
-    private Long accountId = null;
+    @JsonProperty("id")
+    private Long id = null;
 
-    public AccountRespDto accountId(Long accountId) {
-        this.accountId = accountId;
+    public AccountRespDto id(Long id) {
+        this.id = id;
         return this;
     }
 
     /**
-     * Get accountId
-     * @return accountId
+     * Get id
+     * @return id
      **/
-    public Long getAccountId() {
-        return accountId;
+    public Long getId() {
+        return id;
     }
 
     @Override
@@ -34,12 +34,12 @@ public class AccountRespDto {
             return false;
         }
         AccountRespDto accountRespDto = (AccountRespDto) o;
-        return Objects.equals(this.accountId, accountRespDto.accountId);
+        return Objects.equals(this.id, accountRespDto.id);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(accountId);
+        return Objects.hash(id);
     }
 
     @Override
@@ -47,7 +47,7 @@ public class AccountRespDto {
         StringBuilder sb = new StringBuilder();
         sb.append("class AccountRespDto {\n");
 
-        sb.append("    userId: ").append(toIndentedString(accountId)).append("\n");
+        sb.append("    id: ").append(toIndentedString(id)).append("\n");
         sb.append("}");
         return sb.toString();
     }

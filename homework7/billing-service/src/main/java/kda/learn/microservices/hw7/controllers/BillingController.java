@@ -1,5 +1,7 @@
 package kda.learn.microservices.hw7.controllers;
 
+import kda.learn.microservices.hw7.BillingPaymentFailedException;
+import kda.learn.microservices.hw7.WrongQueryException;
 import kda.learn.microservices.hw7.dto.AccountReqDto;
 import kda.learn.microservices.hw7.dto.AccountRespDto;
 import kda.learn.microservices.hw7.dto.DebitReqDto;
@@ -30,21 +32,25 @@ public class BillingController {
     public ResponseEntity<AccountRespDto> createAccount(@RequestBody AccountReqDto accountReqDto) {
         log.info("CALL: createAccount");
         var accountId = service.createAccount(accountReqDto.getUserId());
-        return new ResponseEntity<>(new AccountRespDto().accountId(accountId), HttpStatus.CREATED);
+        return new ResponseEntity<>(new AccountRespDto().id(accountId), HttpStatus.CREATED);
     }
 
     @PostMapping(value = "/deposit")
     public ResponseEntity<Void> depositAccount(@RequestBody DepositReqDto depositReqDto) {
         log.info("CALL: depositAccount");
-        service.depositAccount(depositReqDto.getAccountId(), depositReqDto.getSum());
-        return new ResponseEntity<>(HttpStatus.ACCEPTED);
+        if (service.depositAccount(depositReqDto.getAccountId(), depositReqDto.getSum()))
+            return new ResponseEntity<>(HttpStatus.ACCEPTED);
+        else
+            throw new WrongQueryException("Не удалось внести деньги на счет");
     }
 
     @PostMapping(value = "/debit")
     public ResponseEntity<Void> debitAccount(@RequestBody DebitReqDto debitReqDto) {
         log.info("CALL: debitAccount");
-        service.debitAccount(debitReqDto.getAccountId(), debitReqDto.getSum());
-        return new ResponseEntity<>(HttpStatus.ACCEPTED);
+        if (service.debitAccount(debitReqDto.getAccountId(), debitReqDto.getSum()))
+            return new ResponseEntity<>(HttpStatus.ACCEPTED);
+        else
+            throw new BillingPaymentFailedException("Не удалось списать деньги");
     }
 
     @GetMapping(value = "/accounts")
