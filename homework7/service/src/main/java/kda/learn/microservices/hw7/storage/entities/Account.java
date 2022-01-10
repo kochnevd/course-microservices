@@ -21,13 +21,17 @@ public class Account {
         return id;
     }
 
-    public Account setUserId(Integer userId) {
-        this.userId = userId;
-        return this;
+    public Integer getUserId() {
+        return userId;
     }
 
     public BigDecimal getBalance() {
         return balance;
+    }
+
+    public Account setUserId(Integer userId) {
+        this.userId = userId;
+        return this;
     }
 
     public Account setBalance(BigDecimal balance) {

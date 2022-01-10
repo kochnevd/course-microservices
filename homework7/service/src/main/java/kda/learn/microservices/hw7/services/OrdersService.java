@@ -1,6 +1,7 @@
 package kda.learn.microservices.hw7.services;
 
 import kda.learn.microservices.hw7.storage.Storage;
+import kda.learn.microservices.hw7.storage.entities.Order;
 import kda.learn.microservices.hw7.storage.entities.User;
 import org.springframework.stereotype.Service;
 
@@ -15,7 +16,12 @@ public class OrdersService {
 
     public User createUser(User user) {
         User newUser = storage.createUser(user);
-        storage.createAccount(newUser.getId());
+        storage.createAccount(newUser.getId()); // TODO: переделать на вызов сервиса биллинга
         return newUser;
+    }
+
+    public Order createOrder(Order order) {
+        storage.debitAccount(order.getUserId(), order.getCost()); // TODO: переделать на вызов сервиса биллинга
+        return storage.createOrder(order);
     }
 }

@@ -5,6 +5,7 @@ import kda.learn.microservices.hw7.dto.OrderReqDto;
 import kda.learn.microservices.hw7.dto.UserReqDto;
 import kda.learn.microservices.hw7.dto.UserRespDto;
 import kda.learn.microservices.hw7.services.OrdersService;
+import kda.learn.microservices.hw7.transformers.OrdersTransformer;
 import kda.learn.microservices.hw7.transformers.UsersTransformer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,9 +28,16 @@ public class OrdersController {
     }
 
     @PostMapping(value = "/order")
-    public ResponseEntity<OrderRespDto> createOrder(@RequestBody OrderReqDto body) {
+    public ResponseEntity<OrderRespDto> createOrder(@RequestBody OrderReqDto order) {
         log.info("CALL: createOrder");
-        return new ResponseEntity<>(HttpStatus.PAYMENT_REQUIRED);
+
+        OrderRespDto res = OrdersTransformer.transformToDto(
+                service.createOrder(
+                        OrdersTransformer.transformFromDto(order)
+                )
+        );
+
+        return new ResponseEntity<>(res, HttpStatus.CREATED);
     }
 
     @PostMapping(value = "/user")

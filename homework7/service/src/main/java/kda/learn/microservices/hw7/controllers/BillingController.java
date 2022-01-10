@@ -19,7 +19,7 @@ import java.util.List;
 @Validated
 @RequestMapping("/")
 public class BillingController {
-
+//TODO: вынести в отдельный микросервис
     private static final Logger log = LoggerFactory.getLogger(BillingController.class);
     private final BillingService service;
 
