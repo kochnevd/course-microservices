@@ -36,7 +36,7 @@ public class Storage {
         return ordersRepository.save(order);
     }
 
-    public void debitAccount(long userId, BigDecimal cost) {
+    public boolean debitAccount(long userId, BigDecimal cost) {
         var account = StreamSupport.stream(
                     accountsCRUDRepository
                     .findAll()
@@ -45,17 +45,18 @@ public class Storage {
                 .findAny()
                 .orElse(null);
         if (account == null) {
-            // TODO: аккаунт не существует
-            throw new RuntimeException("нет аккаунта в сервисе биллинга");
+            // аккаунт не существует
+            return false;
         }
 
         double balance = account.getBalance().doubleValue();
         if (balance < cost.doubleValue()) {
-            // TODO: недостаточно денег
-            throw new RuntimeException("недостаточно денег");
+            // недостаточно денег
+            return false;
         } else {
             account.setBalance(BigDecimal.valueOf(balance - cost.doubleValue()));
             accountsCRUDRepository.save(account);
+            return true;
         }
     }
 }
