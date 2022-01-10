@@ -10,19 +10,21 @@ import org.springframework.stereotype.Service;
 public class OrdersService {
 
     private final Storage storage;
+    private final BillingService billingService;
 
-    public OrdersService(Storage storage) {
+    public OrdersService(Storage storage, BillingService billingService) {
         this.storage = storage;
+        this.billingService = billingService;
     }
 
     public User createUser(User user) {
         User newUser = storage.createUser(user);
-        storage.createAccount(newUser.getId()); // TODO: переделать на вызов сервиса биллинга
+        billingService.createAccount(newUser.getId());
         return newUser;
     }
 
     public Order createOrder(Order order) {
-        if (storage.debitAccount(order.getUserId(), order.getCost())) // TODO: переделать на вызов сервиса биллинга
+        if (billingService.debitAccount(order.getUserId(), order.getCost()))
             return storage.createOrder(order);
 
         throw new BillingPaymentFailedException("Не удалось списать деньги со счета");

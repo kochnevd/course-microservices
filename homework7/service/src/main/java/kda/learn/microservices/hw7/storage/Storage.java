@@ -6,6 +6,8 @@ import kda.learn.microservices.hw7.storage.entities.User;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
+import java.util.List;
+import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
 @Component
@@ -36,7 +38,7 @@ public class Storage {
         return ordersRepository.save(order);
     }
 
-    public boolean debitAccount(long userId, BigDecimal cost) {
+    public boolean debitAccount(long userId, BigDecimal sum) {
         var account = StreamSupport.stream(
                     accountsCRUDRepository
                     .findAll()
@@ -50,13 +52,19 @@ public class Storage {
         }
 
         double balance = account.getBalance().doubleValue();
-        if (balance < cost.doubleValue()) {
+        if (balance < sum.doubleValue()) {
             // недостаточно денег
             return false;
         } else {
-            account.setBalance(BigDecimal.valueOf(balance - cost.doubleValue()));
+            account.setBalance(BigDecimal.valueOf(balance - sum.doubleValue()));
             accountsCRUDRepository.save(account);
             return true;
         }
+    }
+
+    public List<Account> getAccounts() {
+        return StreamSupport
+                .stream(accountsCRUDRepository.findAll().spliterator(), false)
+                .collect(Collectors.toList());
     }
 }

@@ -1,25 +1,30 @@
 package kda.learn.microservices.hw7.services;
 
-import kda.learn.microservices.hw7.storage.AccountsCRUDRepository;
+import kda.learn.microservices.hw7.storage.Storage;
 import kda.learn.microservices.hw7.storage.entities.Account;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
 
 @Service
 public class BillingService {
 
-    private final AccountsCRUDRepository accountsCRUDRepository;
+    private final Storage storage;
 
-    public BillingService(AccountsCRUDRepository accountsCRUDRepository) {
-        this.accountsCRUDRepository = accountsCRUDRepository;
+    public BillingService(Storage storage) {
+        this.storage = storage;
     }
 
     public List<Account> getAccounts() {
-        return StreamSupport
-                .stream(accountsCRUDRepository.findAll().spliterator(), false)
-                .collect(Collectors.toList());
+        return storage.getAccounts();
+    }
+
+    public void createAccount(Integer userId) {
+        storage.createAccount(userId);
+    }
+
+    public boolean debitAccount(Integer userId, BigDecimal sum) {
+        return storage.debitAccount(userId, sum);
     }
 }
