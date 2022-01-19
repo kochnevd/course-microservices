@@ -1,20 +1,19 @@
 package kda.learn.microservices.hw7.services;
 
+import kda.learn.microservices.hw7.integrations.notifications.NotificationsKafkaProducer;
+import kda.learn.microservices.hw7.transformers.NotificationsTransformer;
 import org.springframework.stereotype.Service;
-
-import java.util.ArrayList;
-import java.util.List;
 
 @Service
 public class NotificationService {
 
-    private final List<String> messages = new ArrayList<>();
+    private final NotificationsKafkaProducer kafkaProducer;
 
-    public List<String> getMessages() {
-        return messages;
+    public NotificationService(NotificationsKafkaProducer kafkaProducer) {
+        this.kafkaProducer = kafkaProducer;
     }
 
     public void sendMessage(String email, String body) {
-        messages.add(email + ": " + body);
+        kafkaProducer.sendMessage(NotificationsTransformer.transformToDto(body, email));
     }
 }
