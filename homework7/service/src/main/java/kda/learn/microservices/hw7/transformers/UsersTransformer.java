@@ -15,6 +15,7 @@ public class UsersTransformer {
 
     public static UserRespDto transformToDto(User user) {
         return new UserRespDto()
-                .id(user.getId());
+                .id(user.getId())
+                .accountId(user.getAccountId());
     }
 }

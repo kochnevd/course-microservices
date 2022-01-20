@@ -12,8 +12,16 @@ public class UserRespDto {
     @JsonProperty("id")
     private Long id = null;
 
+    @JsonProperty("accountId")
+    private Long accountId = null;
+
     public UserRespDto id(Long id) {
         this.id = id;
+        return this;
+    }
+
+    public UserRespDto accountId(Long accountId) {
+        this.accountId = accountId;
         return this;
     }
 
@@ -23,6 +31,10 @@ public class UserRespDto {
      **/
     public Long getId() {
         return id;
+    }
+
+    public Long getAccountId() {
+        return accountId;
     }
 
     @Override
