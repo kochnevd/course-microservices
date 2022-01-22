@@ -1,0 +1,129 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: hw7-deployment-app
+  labels:
+    app: app-hw7-app
+spec:
+  selector:
+    matchLabels:
+      app: app-hw7-app
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: app-hw7-app
+    spec:
+      containers:            
+        - image: kochnevd/course-microservices:service-hw7-app
+          imagePullPolicy: Always
+          name: service-hw7-app-container
+          envFrom:
+          - configMapRef:
+              name: hw7-service-config
+          env:
+            - name: server.port
+              value: "8080"
+          ports:
+            - containerPort: 8080
+              name: web
+          livenessProbe:
+            httpGet:
+              path: /actuator/health
+              port: web
+            initialDelaySeconds: 10
+            periodSeconds: 30
+          readinessProbe:
+            httpGet:
+              path: /actuator/health
+              port: web
+            initialDelaySeconds: 10
+            periodSeconds: 15
+
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: hw7-deployment-billing
+  labels:
+    app: app-hw7-billing
+spec:
+  selector:
+    matchLabels:
+      app: app-hw7-billing
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: app-hw7-billing
+    spec:
+      containers:            
+        - image: kochnevd/course-microservices:service-hw7-billing
+          imagePullPolicy: Always
+          name: service-hw7-billing-container
+          envFrom:
+          - configMapRef:
+              name: hw7-service-config
+          env:
+            - name: server.port
+              value: "8080"
+          ports:
+            - containerPort: 8080
+              name: web
+          livenessProbe:
+            httpGet:
+              path: /actuator/health
+              port: web
+            initialDelaySeconds: 10
+            periodSeconds: 30
+          readinessProbe:
+            httpGet:
+              path: /actuator/health
+              port: web
+            initialDelaySeconds: 10
+            periodSeconds: 15
+
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: hw7-deployment-notifications
+  labels:
+    app: app-hw7-notifications
+spec:
+  selector:
+    matchLabels:
+      app: app-hw7-notifications
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: app-hw7-notifications
+    spec:
+      containers:            
+        - image: kochnevd/course-microservices:service-hw7-notifications
+          imagePullPolicy: Always
+          name: service-hw7-notifications-container
+          envFrom:
+          - configMapRef:
+              name: hw7-service-config
+          env:
+            - name: server.port
+              value: "8080"
+          ports:
+            - containerPort: 8080
+              name: web
+          livenessProbe:
+            httpGet:
+              path: /actuator/health
+              port: web
+            initialDelaySeconds: 10
+            periodSeconds: 30
+          readinessProbe:
+            httpGet:
+              path: /actuator/health
+              port: web
+            initialDelaySeconds: 10
+            periodSeconds: 15

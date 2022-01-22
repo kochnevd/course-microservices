@@ -1,0 +1,33 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: hw7-ingress
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    nginx.ingress.kubernetes.io/use-regex: "true"
+spec:
+  rules:
+    - host: arch.homework
+      http:
+        paths:
+          - backend:
+              service:
+                name: hw7-service
+                port:
+                  number: 80
+            pathType: Prefix
+            path: /(user|order).*
+          - backend:
+              service:
+                name: hw7-service-billing
+                port:
+                  number: 80
+            pathType: Prefix
+            path: /(deposit|debit|account|accounts).*
+          - backend:
+              service:
+                name: hw7-service-notifications
+                port:
+                  number: 80
+            pathType: Prefix
+            path: /messages
