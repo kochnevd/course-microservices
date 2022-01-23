@@ -1,59 +1,58 @@
 # Порядок установки
 1. Создать namespace
 ```Shell
-   k apply -f namespace.yaml
+kubectl apply -f namespace.yaml
 ```
 
-1. Создать persistent volume
+2. Создать persistent volume
 ```Shell
-   kubectl apply -f pv.yaml
+kubectl apply -f pv.yaml
 ```
    
-1. Добавить репозиторий Helm
+3. Добавить репозиторий Helm
 ```Shell
-   helm repo add incubator https://charts.helm.sh/incubator
+helm repo add incubator https://charts.helm.sh/incubator
 ```
 
-1. Установить хельм чарт
+4. Установить хельм чарт
 ```Shell
-   helm install kafka --namespace kafka incubator/kafka -f values.yaml --debug
+helm install kafka --namespace kafka incubator/kafka -f values.yaml --debug
 ```
 
-1. Проверка
-    - Тестовый клиент для проверки:
+5. Проверка
+- Тестовый клиент для проверки:
 ```Shell
-      kubectl apply -f testclient.yaml
+kubectl apply -f testclient.yaml
+```
+- Создание топика:
+```Shell
+kubectl -n kafka exec -ti testclient -- ./bin/kafka-topics.sh --zookeeper kafka-zookeeper:2181 --topic messages --create --partitions 1 --replication-factor 1
 ```
 
-    - Создание топика:
+- Проверка топика:
 ```Shell
-      kubectl -n kafka exec -ti testclient -- ./bin/kafka-topics.sh --zookeeper kafka-zookeeper:2181 --topic messages --create --partitions 1 --replication-factor 1
+kubectl -n kafka exec -ti testclient -- ./bin/kafka-topics.sh --zookeeper kafka-zookeeper:2181 --list
 ```
 
-    - Проверка топика:
+- Создание консьюмера (в отдельной консоли):
 ```Shell
-      kubectl -n kafka exec -ti testclient -- ./bin/kafka-topics.sh --zookeeper kafka-zookeeper:2181 --list
+kubectl -n kafka exec -ti testclient -- ./bin/kafka-console-consumer.sh --bootstrap-server kafka:9092 --topic messages --from-beginning
 ```
 
-    - Создание консьюмера (в отдельной консоли):
+- Создание продюсера:
 ```Shell
-      kubectl -n kafka exec -ti testclient -- ./bin/kafka-console-consumer.sh --bootstrap-server kafka:9092 --topic messages --from-beginning
+kubectl -n kafka exec -ti testclient -- ./bin/kafka-console-producer.sh --broker-list kafka:9092 --topic messages
 ```
 
-    - Создание продюсера:
-```Shell
-      kubectl -n kafka exec -ti testclient -- ./bin/kafka-console-producer.sh --broker-list kafka:9092 --topic messages
-```
-
-    Сообщения из окна продюсера отображаются в окне консьюмера
+Сообщения из окна продюсера отображаются в окне консьюмера
 
 # Порядок удаления
 1. Удалить неймспейс
 ```Shell
-   kubectl delete -f namespace.yaml
+kubectl delete -f namespace.yaml
 ```
 
-1. Удалить persistent volume
+2. Удалить persistent volume
 ```Shell
-   kubectl delete -f pv.yaml
+kubectl delete -f pv.yaml
 ```
