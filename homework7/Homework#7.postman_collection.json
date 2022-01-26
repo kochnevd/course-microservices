@@ -1,0 +1,410 @@
+{
+	"info": {
+		"_postman_id": "7fa5484c-9982-4045-b1a6-7dea96b93231",
+		"name": "Homework#7",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Create user",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 201\", function () {\r",
+							"    pm.response.to.have.status(201);\r",
+							"\r",
+							"    var jsonResponse = JSON.parse(responseBody);\r",
+							"    pm.collectionVariables.set(\"userid\", jsonResponse[\"id\"])\r",
+							"    pm.collectionVariables.set(\"accountid\", jsonResponse[\"accountId\"])\r",
+							"    pm.collectionVariables.set(\"balance\", 0)\r",
+							"\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"login\": \"kda\",\r\n  \"firstName\": \"Дмитрий\",\r\n  \"lastName\": \"Кочнев\",\r\n  \"email\": \"kochnevd@mail.ru\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://{{baseUrl}}{{port}}/user",
+					"protocol": "http",
+					"host": [
+						"{{baseUrl}}{{port}}"
+					],
+					"path": [
+						"user"
+					]
+				},
+				"description": "Создать пользователя. Должен создаться аккаунт в биллинге."
+			},
+			"response": []
+		},
+		{
+			"name": "Deposit account",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 202\", function () {\r",
+							"    pm.response.to.have.status(202);\r",
+							"    newBalance = Number(pm.collectionVariables.get(\"balance\")) + Number(pm.collectionVariables.get(\"initialBalance\"));\r",
+							"    pm.collectionVariables.set(\"balance\", newBalance);\r",
+							"    console.info(\"newBalance = \" + newBalance);\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"accountId\": {{accountid}},\r\n  \"sum\": {{initialBalance}}\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://{{baseUrl}}{{portBilling}}/deposit",
+					"protocol": "http",
+					"host": [
+						"{{baseUrl}}{{portBilling}}"
+					],
+					"path": [
+						"deposit"
+					]
+				},
+				"description": "Положить деньги на счет пользователя через сервис биллинга."
+			},
+			"response": []
+		},
+		{
+			"name": "Create order",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 201 (and change balance)\", function () {\r",
+							"    pm.response.to.have.status(201);\r",
+							"    newBalance = Number(pm.collectionVariables.get(\"balance\")) - Number(pm.collectionVariables.get(\"orderCost\"));\r",
+							"    pm.collectionVariables.set(\"balance\", newBalance);\r",
+							"    console.info(\"newBalance = \" + newBalance);\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"userId\": \"{{userid}}\",\r\n  \"cost\": {{orderCost}},\r\n  \"orderContent\": \"Сумка: 1 шт.\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://{{baseUrl}}{{port}}/order",
+					"protocol": "http",
+					"host": [
+						"{{baseUrl}}{{port}}"
+					],
+					"path": [
+						"order"
+					]
+				},
+				"description": "Сделать заказ, на который хватает денег."
+			},
+			"response": []
+		},
+		{
+			"name": "Check balance",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Check balance\", function () {\r",
+							"    var jsonData = pm.response.json();\r",
+							"    accountId = pm.collectionVariables.get(\"accountid\");\r",
+							"    const account = jsonData.find(a => a.id == accountId)\r",
+							"    if(account) {\r",
+							"        newBalance = Number(account.balance);\r",
+							"        expectedBalance = Number(pm.collectionVariables.get(\"balance\"));\r",
+							"        pm.expect(newBalance).to.eql(expectedBalance);\r",
+							"    } else {\r",
+							"        pm.expect.fail(\"Account not found by id \" + accountId);\r",
+							"    }\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://{{baseUrl}}{{portBilling}}/accounts",
+					"protocol": "http",
+					"host": [
+						"{{baseUrl}}{{portBilling}}"
+					],
+					"path": [
+						"accounts"
+					]
+				},
+				"description": "Посмотреть деньги на счету пользователя и убедиться, что их сняли."
+			},
+			"response": []
+		},
+		{
+			"name": "Check notification",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Check if the last notification is success order\", function () {\r",
+							"    var jsonData = pm.response.json();\r",
+							"    lastMessage = jsonData.pop(); // last string\r",
+							"    if(lastMessage) {\r",
+							"        pm.expect(lastMessage).to.include(\"Успешный заказ\");\r",
+							"    } else {\r",
+							"        pm.expect.fail(\"Message not found\");\r",
+							"    }\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://{{baseUrl}}{{portNotification}}/messages",
+					"protocol": "http",
+					"host": [
+						"{{baseUrl}}{{portNotification}}"
+					],
+					"path": [
+						"messages"
+					]
+				},
+				"description": "Посмотреть в сервисе нотификаций отправленные сообщения и убедиться, что сообщение отправилось"
+			},
+			"response": []
+		},
+		{
+			"name": "Create order (not enough money)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 402\", function () {\r",
+							"    pm.response.to.have.status(402);\r",
+							"    console.info(\"Balance = \" + pm.collectionVariables.get(\"balance\") + \" (not changed)\");\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"userId\": \"{{userid}}\",\r\n  \"cost\": 300,\r\n  \"orderContent\": \"Сумка: 1 шт.\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://{{baseUrl}}{{port}}/order",
+					"protocol": "http",
+					"host": [
+						"{{baseUrl}}{{port}}"
+					],
+					"path": [
+						"order"
+					]
+				},
+				"description": "Сделать заказ, на который не хватает денег."
+			},
+			"response": []
+		},
+		{
+			"name": "Check balance",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Check balance\", function () {\r",
+							"    var jsonData = pm.response.json();\r",
+							"    accountId = pm.collectionVariables.get(\"accountid\");\r",
+							"    const account = jsonData.find(a => a.id == accountId)\r",
+							"    if(account) {\r",
+							"        newBalance = Number(account.balance);\r",
+							"        expectedBalance = Number(pm.collectionVariables.get(\"balance\"));\r",
+							"        pm.expect(newBalance).to.eql(expectedBalance);\r",
+							"    } else {\r",
+							"        pm.expect.fail(\"Account not found by id \" + accountId);\r",
+							"    }\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://{{baseUrl}}{{portBilling}}/accounts",
+					"protocol": "http",
+					"host": [
+						"{{baseUrl}}{{portBilling}}"
+					],
+					"path": [
+						"accounts"
+					]
+				},
+				"description": "Посмотреть деньги на счету пользователя и убедиться, что их количество не поменялось."
+			},
+			"response": []
+		},
+		{
+			"name": "Check notification #2",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Check if the last notification is denied order\", function () {\r",
+							"    var jsonData = pm.response.json();\r",
+							"    lastMessage = jsonData.pop(); // last string\r",
+							"    if(lastMessage) {\r",
+							"        pm.expect(lastMessage).to.include(\"платеж не прошел\");\r",
+							"    } else {\r",
+							"        pm.expect.fail(\"Message not found\");\r",
+							"    }\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://{{baseUrl}}{{portNotification}}/messages",
+					"protocol": "http",
+					"host": [
+						"{{baseUrl}}{{portNotification}}"
+					],
+					"path": [
+						"messages"
+					]
+				},
+				"description": "Посмотреть в сервисе нотификаций отправленные сообщения и убедиться, что сообщение отправилось"
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "baseUrl",
+			"value": "arch.homework"
+		},
+		{
+			"key": "userid",
+			"value": ""
+		},
+		{
+			"key": "accountid",
+			"value": ""
+		},
+		{
+			"key": "orderCost",
+			"value": "300"
+		},
+		{
+			"key": "initialBalance",
+			"value": "500"
+		},
+		{
+			"key": "balance",
+			"value": ""
+		},
+		{
+			"key": "port",
+			"value": ""
+		},
+		{
+			"key": "portBilling",
+			"value": ""
+		},
+		{
+			"key": "portNotification",
+			"value": ""
+		}
+	]
+}

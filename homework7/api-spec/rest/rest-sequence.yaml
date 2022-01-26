@@ -1,0 +1,172 @@
+openapi: 3.0.0
+info:
+  contact:
+    email: kochnevd@mail.ru
+  title: Регистрация пользователя, создание заказа
+  version: 1.0.0
+tags:
+  - name: order
+    description: Сервис заказов
+  - name: billing
+    description: Сервис биллинга
+  - name: notification
+    description: Сервис нотификаций
+paths:
+  /user:
+    post:
+      tags:
+        - order
+      summary: Создание пользователя
+      description: Создание пользователя. При этом создается аккаунт в сервисе биллинга
+      operationId: createUser
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                login:
+                  type: string
+                firstName:
+                  type: string
+                lastName:
+                  type: string
+                email:
+                  type: string
+      responses:
+        '201':
+          description: Создание пользователя прошло успешно
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+        '400':
+          description: Неправильный запрос
+  /order:
+    post:
+      tags: 
+        - order
+      summary: Создание заказа
+      description: Создание заказа. Списываются деньги, отправляется уведомление пользователю
+      operationId: createOrder
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                userId:
+                  type: integer
+                cost:
+                  type: number
+                orderContent:
+                  type: string
+      responses:
+        '201':
+          description: Создание заказа прошло успешно
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+        '402':
+          description: Не удалось списать деньги
+        '400':
+          description: Неправильный запрос
+  /account:
+    post:
+      tags: 
+        - billing
+      summary: Создание аккаунта
+      description: Создание аккаунта для нового пользователя
+      operationId: createAccount
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                userId:
+                  type: integer
+      responses:
+        '201':
+          description: Создание аккаунта прошло успешно
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+        '400':
+          description: Неправильный запрос
+  /deposit:
+    post:
+      tags: 
+        - billing
+      summary: Зачисление денег
+      description: Зачисление денег на счет
+      operationId: depositAccount
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                accountId:
+                  type: integer
+                sum:
+                  type: number
+      responses:
+        '202':
+          description: Зачисление денег прошло успешно
+        '400':
+          description: Неправильный запрос
+  /debit:
+    post:
+      tags: 
+        - billing
+      summary: Списание денег
+      description: Списание денег со счета
+      operationId: debitAccount
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                accountId:
+                  type: integer
+                sum:
+                  type: number
+      responses:
+        '201':
+          description: Списание денег прошло успешно
+        '402':
+          description: Не удалось списать деньги
+  /send_email:
+    post:
+      tags:
+        - notification
+      summary: Отправка сообщения
+      description: Отправка сообщения пользователю
+      operationId: sendEmail
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  format: email
+                body: 
+                  type: string
+      responses:
+        '202':
+          description: Принято сообщение для отправки
