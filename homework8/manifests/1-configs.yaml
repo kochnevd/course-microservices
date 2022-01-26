@@ -1,0 +1,25 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: hw8-service-config
+data:
+  spring.datasource.url: jdbc:h2:mem:testdb
+  spring.datasource.driverClassName: org.h2.Driver
+  spring.datasource.username: sa
+  spring.datasource.password: ""
+  spring.jpa.database-platform: org.hibernate.dialect.H2Dialect
+  spring.h2.console.enabled: "true"
+  billing.base-url: http://hw8-service-billing
+
+  spring.kafka.bootstrap-servers: kafka.kafka.svc.cluster.local:9092
+
+  spring.kafka.producer.bootstrap-servers:  kafka.kafka.svc.cluster.local:9092
+  spring.kafka.producer.key-serializer:  org.apache.kafka.common.serialization.StringSerializer
+  spring.kafka.producer.value-serializer:  org.springframework.kafka.support.serializer.JsonSerializer
+
+  spring.kafka.consumer.bootstrap-servers: kafka.kafka.svc.cluster.local:9092
+  spring.kafka.consumer.group-id: group_id
+  spring.kafka.consumer.auto-offset-reset: earliest
+  spring.kafka.consumer.key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+  spring.kafka.consumer.value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+
