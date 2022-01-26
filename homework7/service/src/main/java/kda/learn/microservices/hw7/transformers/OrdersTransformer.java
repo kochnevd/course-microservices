@@ -8,6 +8,7 @@ public class OrdersTransformer {
     public static Order transformFromDto(OrderReqDto orderDto) {
         return new Order()
                 .setUserId(orderDto.getUserId())
+                .setUuid(orderDto.getUuid())
                 .setCost(orderDto.getCost())
                 .setOrderContent(orderDto.getOrderContent());
     }

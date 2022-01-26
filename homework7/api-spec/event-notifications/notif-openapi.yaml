@@ -62,6 +62,8 @@ paths:
                   type: number
                 orderContent:
                   type: string
+                uuid:
+                  type: string
       responses:
         '201':
           description: Создание заказа прошло успешно

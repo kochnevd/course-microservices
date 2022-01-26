@@ -4,10 +4,14 @@ import kda.learn.microservices.hw7.BillingPaymentFailedException;
 import kda.learn.microservices.hw7.storage.Storage;
 import kda.learn.microservices.hw7.storage.entities.Order;
 import kda.learn.microservices.hw7.storage.entities.User;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 @Service
 public class OrdersService {
+
+    private static final Logger log = LoggerFactory.getLogger(OrdersService.class);
 
     private final Storage storage;
     private final NotificationService notificationService;
@@ -29,6 +33,12 @@ public class OrdersService {
 
     public Order createOrder(Order order) {
         User user = storage.getUser(order.getUserId());
+
+        Order existingOrder = storage.findOrderByUuid(order.getUuid());
+        if (existingOrder != null) {
+            log.warn("Повторная попытка записи заказа uuid=" + existingOrder.getUuid());
+            return existingOrder;
+        }
 
         if (billingService.debitAccount(user.getAccountId(), order.getCost())) {
             notificationService.sendMessage(user.getEmail(),

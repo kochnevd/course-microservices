@@ -20,6 +20,9 @@ public class OrderReqDto {
   @JsonProperty("orderContent")
   private String orderContent = null;
 
+  @JsonProperty("uuid")
+  private String uuid = null;
+
   public OrderReqDto userId(Long userId) {
     this.userId = userId;
     return this;
@@ -57,6 +60,19 @@ public class OrderReqDto {
    **/
   public String getOrderContent() {
     return orderContent;
+  }
+
+  public OrderReqDto uuid(String uuid) {
+    this.uuid = uuid;
+    return this;
+  }
+
+  /**
+   * Get uuid
+   * @return uuid
+   **/
+  public String getUuid() {
+    return uuid;
   }
 
   @Override

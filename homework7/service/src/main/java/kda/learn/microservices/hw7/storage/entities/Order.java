@@ -20,6 +20,9 @@ public class Order {
     @Column
     private BigDecimal cost;
 
+    @Column(name = "uuid")
+    private String uuid;
+
     public Long getId() {
         return id;
     }
@@ -36,6 +39,10 @@ public class Order {
         return userId;
     }
 
+    public String getUuid() {
+        return uuid;
+    }
+
     public Order setUserId(Long userId) {
         this.userId = userId;
         return this;
@@ -48,6 +55,11 @@ public class Order {
 
     public Order setCost(BigDecimal cost) {
         this.cost = cost;
+        return this;
+    }
+
+    public Order setUuid(String uuid) {
+        this.uuid = uuid;
         return this;
     }
 }
