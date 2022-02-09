@@ -1,0 +1,32 @@
+An Overview of Sharding in PostgreSQL and How it Relates to MongoDB's - Percona Database Performance Blog
+https://www.percona.com/blog/2019/05/24/an-overview-of-sharding-in-postgresql-and-how-it-relates-to-mongodbs/
+
+MySQL :: MySQL 8.0 Reference Manual :: 24 Partitioning
+https://dev.mysql.com/doc/refman/8.0/en/partitioning.html
+
+Foreign Data Wrappers in PostgreSQL and a closer look at postgres_fdw - Percona Database Performance Blog
+https://www.percona.com/blog/2018/08/21/foreign-data-wrappers-postgresql-postgres_fdw/
+
+"Sharding - patterns & antipatterns". Доклад Алексея Рыбака (Badoo) и Константина Осипова (Mail.ru)
+https://youtu.be/MhGO7BBqSBU
+
+pg_shardman: шардинг в PostgreSQL / А.Шер, С.Кельвич (Postgres Professional)
+https://youtu.be/ihrPoHlDFkk
+
+F.33. postgres_fdw
+https://www.postgresql.org/docs/12/postgres-fdw.html
+
+MapReduce
+https://www.bigdataschool.ru/wiki/mapreduce
+
+Теория шардирования / Андрей Аксёнов (Авито)
+https://youtu.be/xx_Lv1P_X_I
+
+MySQL :: MySQL NDB Cluster: Scalability
+https://www.mysql.com/products/cluster/scalability.html
+
+Distributed | ClickHouse Documentation
+https://clickhouse.com/docs/en/engines/table-engines/special/distributed/
+
+5.11. Table Partitioning
+https://www.postgresql.org/docs/12/ddl-partitioning.html

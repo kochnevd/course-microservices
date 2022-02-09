@@ -1,0 +1,11 @@
+memcached - a distributed memory object caching system
+https://memcached.org/blog/modern-lru/
+
+What is Consistent Hashing and Where is it used?
+https://youtu.be/zaRkONvyGr8
+
+A Guide to Consistent Hashing
+https://www.toptal.com/big-data/consistent-hashing
+
+Nginx cache: всЄ новое Ч хорошо забытое старое
+https://habr.com/ru/post/428127/
