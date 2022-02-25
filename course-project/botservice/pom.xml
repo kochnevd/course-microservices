@@ -9,7 +9,7 @@
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>kda.learn.microservices</groupId>
-    <artifactId>project</artifactId>
+    <artifactId>project.botservice</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <name>course-project</name>
     <description>Graduation project</description>
