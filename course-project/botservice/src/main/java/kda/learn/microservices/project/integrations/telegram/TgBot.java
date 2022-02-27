@@ -1,5 +1,8 @@
 package kda.learn.microservices.project.integrations.telegram;
 
+import kda.learn.microservices.project.cure.UserMessageProcessor;
+import kda.learn.microservices.project.integrations.telegram.commands.HelpTextCommand;
+import kda.learn.microservices.project.integrations.telegram.commands.StartTextCommand;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -13,14 +16,11 @@ import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 /**
  * Класс для обработки сообщений бота.
- * Ссылка на бот: http://t.me/the_cure_bot
- * Управление ботом: https://t.me/botfather
- * Описание Bot API: https://core.telegram.org/bots/api
- *
- * В создании бота помогла статья: https://habr.com/ru/post/528694/
  */
 @Component
 public class TgBot extends TelegramLongPollingCommandBot {
+
+    private final UserMessageProcessor messageProcessor;
 
     @Value("${telegram.bot.token}")
     private String bot_token;
@@ -33,9 +33,13 @@ public class TgBot extends TelegramLongPollingCommandBot {
     public TgBot() {
         super();
         log.info("################### TgBot created");
-        // Регистрируем команды
-        // TODO register(command)
 
+        //создаём основной класс для работы с текстовыми сообщениями, не являющимися командами
+        this.messageProcessor = new UserMessageProcessor();
+
+        // Регистрируем команды
+        register(new StartTextCommand("start", "Старт")); // TODO: автоматизировать сбор списка комманд
+        register(new HelpTextCommand("help", "Справка"));
     }
 
     @Override
@@ -64,7 +68,9 @@ public class TgBot extends TelegramLongPollingCommandBot {
         Long chatId = msg.getChatId();
         String userName = getUserName(msg);
 
-        setAnswer(chatId, userName, "################### my answer");
+        String answer = messageProcessor.processMessage(msg.getText(), ModelTransformer.userTgToModel(msg.getFrom()));
+
+        setAnswer(chatId, userName, answer);
     }
 
     /**
@@ -90,7 +96,7 @@ public class TgBot extends TelegramLongPollingCommandBot {
         try {
             execute(answer);
         } catch (TelegramApiException e) {
-            //логируем сбой Telegram Bot API, используя userName
+            //TODO: логируем сбой Telegram Bot API, используя userName
         }
     }
 
