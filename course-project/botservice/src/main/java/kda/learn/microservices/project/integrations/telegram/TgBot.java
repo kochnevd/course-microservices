@@ -30,12 +30,12 @@ public class TgBot extends TelegramLongPollingCommandBot {
 
     private final Logger log = LoggerFactory.getLogger(TgBot.class);
 
-    public TgBot() {
+    public TgBot(UserMessageProcessor messageProcessor) {
         super();
         log.info("################### TgBot created");
 
         //создаём основной класс для работы с текстовыми сообщениями, не являющимися командами
-        this.messageProcessor = new UserMessageProcessor();
+        this.messageProcessor = messageProcessor;
 
         // Регистрируем команды
         register(new StartTextCommand("start", "Старт")); // TODO: автоматизировать сбор списка комманд
