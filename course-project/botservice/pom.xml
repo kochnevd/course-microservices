@@ -17,7 +17,7 @@
         <java.version>11</java.version>
         <maven.compiler.source>${java.version}</maven.compiler.source>
         <maven.compiler.target>${java.version}</maven.compiler.target>
-        <telegram.version>5.0.1</telegram.version>
+        <telegram.version>5.7.1</telegram.version>
     </properties>
     <dependencies>
         <dependency>

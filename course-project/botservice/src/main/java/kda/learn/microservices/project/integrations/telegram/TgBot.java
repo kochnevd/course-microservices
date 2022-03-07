@@ -1,6 +1,5 @@
 package kda.learn.microservices.project.integrations.telegram;
 
-import kda.learn.microservices.project.cure.UserMessageProcessor;
 import kda.learn.microservices.project.integrations.telegram.commands.HelpTextCommand;
 import kda.learn.microservices.project.integrations.telegram.commands.StartTextCommand;
 import org.slf4j.Logger;
@@ -8,17 +7,22 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.extensions.bots.commandbot.TelegramLongPollingCommandBot;
+import org.telegram.telegrambots.meta.api.methods.BotApiMethod;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.User;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
+import java.util.List;
+
 /**
  * Класс для обработки сообщений бота.
  */
 @Component
-public class TgBot extends TelegramLongPollingCommandBot {
+public class TgBot extends TelegramLongPollingCommandBot implements TgSender {
+
+    private final Logger log = LoggerFactory.getLogger(TgBot.class);
 
     private final UserMessageProcessor messageProcessor;
 
@@ -28,17 +32,16 @@ public class TgBot extends TelegramLongPollingCommandBot {
     @Value("${telegram.bot.username}")
     private String bot_username;
 
-    private final Logger log = LoggerFactory.getLogger(TgBot.class);
-
     public TgBot(UserMessageProcessor messageProcessor) {
         super();
         log.info("################### TgBot created");
 
-        //создаём основной класс для работы с текстовыми сообщениями, не являющимися командами
+        //класс для работы с текстовыми сообщениями, не являющимися командами
         this.messageProcessor = messageProcessor;
+        messageProcessor.setSender(this);
 
         // Регистрируем команды
-        register(new StartTextCommand("start", "Старт")); // TODO: автоматизировать сбор списка комманд
+        register(new StartTextCommand("start", "Старт"));
         register(new HelpTextCommand("help", "Справка"));
     }
 
@@ -64,40 +67,37 @@ public class TgBot extends TelegramLongPollingCommandBot {
     public void processNonCommandUpdate(Update update) {
         log.info("################### processNonCommandUpdate ({})", update);
 
-        Message msg = update.getMessage();
-        Long chatId = msg.getChatId();
-        String userName = getUserName(msg);
-
-        String answer = messageProcessor.processMessage(msg.getText(), ModelTransformer.userTgToModel(msg.getFrom()));
-
-        setAnswer(chatId, userName, answer);
-    }
-
-    /**
-     * Формирование имени пользователя
-     * @param msg сообщение
-     */
-    private String getUserName(Message msg) {
-        User user = msg.getFrom();
-        String userName = user.getUserName();
-        return (userName != null) ? userName : String.format("%s %s", user.getLastName(), user.getFirstName());
-    }
-
-    /**
-     * Отправка ответа
-     * @param chatId id чата
-     * @param userName имя пользователя
-     * @param text текст ответа
-     */
-    private void setAnswer(Long chatId, String userName, String text) {
-        SendMessage answer = new SendMessage();
-        answer.setText(text);
-        answer.setChatId(chatId.toString());
-        try {
-            execute(answer);
-        } catch (TelegramApiException e) {
-            //TODO: логируем сбой Telegram Bot API, используя userName
+        if (update.hasCallbackQuery()) {
+            messageProcessor.processCallbackQuery(update.getCallbackQuery());
         }
+        else if (update.hasMessage()) {
+            Message msg = update.getMessage();
+            var chatId = msg.getChatId().toString();
+            messageProcessor.processMessage(chatId, msg.getText());
+        }
+        else {
+            log.warn("## Unknown update received: {}", update);
+        }
+    }
+
+    @Override
+    public void send(BotApiMethod<?> message) {
+        try {
+            execute(message);
+        } catch (TelegramApiException e) {
+            log.error("сбой Telegram Bot API", e);
+        }
+    }
+
+    @Override
+    public void send(String chatId, String text) {
+        // TODO: дубль с AbstractTextCommand.sendAnswer
+        SendMessage message = new SendMessage();
+        //включаем поддержку режима разметки, чтобы управлять отображением текста и добавлять эмодзи
+        message.enableMarkdownV2(true);
+        message.setChatId(chatId);
+        message.setText(text);
+        send(message);
     }
 
 }
