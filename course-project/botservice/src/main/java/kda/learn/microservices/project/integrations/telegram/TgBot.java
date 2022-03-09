@@ -11,10 +11,7 @@ import org.telegram.telegrambots.meta.api.methods.BotApiMethod;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
-import org.telegram.telegrambots.meta.api.objects.User;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
-
-import java.util.List;
 
 /**
  * Класс для обработки сообщений бота.
@@ -38,7 +35,7 @@ public class TgBot extends TelegramLongPollingCommandBot implements TgSender {
 
         //класс для работы с текстовыми сообщениями, не являющимися командами
         this.messageProcessor = messageProcessor;
-        messageProcessor.setSender(this);
+        messageProcessor.setTgSender(this);
 
         // Регистрируем команды
         register(new StartTextCommand("start", "Старт"));

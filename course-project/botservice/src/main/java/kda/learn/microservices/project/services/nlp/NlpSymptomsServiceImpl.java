@@ -6,7 +6,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Service
-public class NlpSymptoms {
+public class NlpSymptomsServiceImpl implements NlpSymptomsService {
+
+    @Override
     public List<String> guessDisease(String text) {
         var res = new ArrayList<String>();
         res.add("toothache");

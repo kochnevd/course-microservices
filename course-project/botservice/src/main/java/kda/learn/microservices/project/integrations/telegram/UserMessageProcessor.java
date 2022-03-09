@@ -2,8 +2,10 @@ package kda.learn.microservices.project.integrations.telegram;
 
 import kda.learn.microservices.project.services.disease.DiseaseService;
 import kda.learn.microservices.project.services.disease.model.Disease;
+import kda.learn.microservices.project.services.disease.model.TreatmentTips;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.AnswerCallbackQuery;
+import org.telegram.telegrambots.meta.api.methods.BotApiMethod;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.CallbackQuery;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
@@ -11,11 +13,16 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKe
 
 import java.util.List;
 
+// TODO: вынести бизнес-логику в сервисный класс
+
 @Component
 public class UserMessageProcessor {
 
+    public static final String CALLBACK_PREFIX_DISEASE = "disease:";
+    public static final String CALLBACK_PREFIX_MEDICINES = "medicines:";
+    private static final TreatmentTips TIPS_NOT_FOUND = new TreatmentTips("Советы по данной проблеме отсутствуют.");
     private final DiseaseService diseaseService;
-    private TgSender sender;
+    private TgSender tgSender;
 
     public UserMessageProcessor(DiseaseService diseaseService) {
         this.diseaseService = diseaseService;
@@ -24,20 +31,56 @@ public class UserMessageProcessor {
     public void processMessage(String chatId, String text) {
         var diseases = diseaseService.guessDisease(text);
         for (var disease: diseases) {
-            sender.send(createDiseaseMessage(chatId, disease));
+            tgSender.send(createDiseaseMessage(chatId, disease));
         }
     }
 
     public void processCallbackQuery(CallbackQuery callbackQuery) {
         String data = callbackQuery.getData();
 
-        sender.send(AnswerCallbackQuery
+        var answerBuilder = AnswerCallbackQuery
                 .builder()
-                .text(data) // TODO: вывести что-то полезное или совсем убрать
-                .callbackQueryId(callbackQuery.getId())
-                .build());
+                .callbackQueryId(callbackQuery.getId());
 
-        sender.send(callbackQuery.getMessage().getChatId().toString(), "Далее будем искать лекарства и советы по лечению");
+        if (data.startsWith(CALLBACK_PREFIX_DISEASE)) {
+            tgSender.send(answerBuilder
+                .text("Загружаем советы по лечению")
+                .build());
+            showTreatmentTips(callbackQuery.getMessage().getChatId().toString(),
+                    data.substring(CALLBACK_PREFIX_DISEASE.length()));
+        }
+        else if (data.startsWith(CALLBACK_PREFIX_MEDICINES)) {
+            tgSender.send(answerBuilder
+                    .text("Загружаем список препаратов")
+                    .build());
+            showMedicines(callbackQuery.getMessage().getChatId().toString(),
+                    data.substring(CALLBACK_PREFIX_MEDICINES.length()));
+        }
+        else tgSender.send(answerBuilder
+                    .text("Неизвестный код запроса: " + data)
+                    .showAlert(true)
+                    .build());
+    }
+
+    private void showMedicines(String chatId, String diseaseCode) {
+        throw new RuntimeException("Not implemented");
+        // TODO: implement
+    }
+
+    private void showTreatmentTips(String chatId, String diseaseCode) {
+        var tips = diseaseService.findTreatmentTips(diseaseCode);
+        if (tips == null) tips = TIPS_NOT_FOUND;
+        tgSender.send(getTipsFormattedMessage(chatId, tips));
+    }
+
+    private BotApiMethod<?> getTipsFormattedMessage(String chatId, TreatmentTips tips) {
+        StringBuilder res = new StringBuilder();
+        tips.getUrls().forEach((url, description) -> res.append(description).append(": ").append(url).append("\n"));
+        if (res.length() > 0) res.insert(0, "\n\n<b>Полезные ссылки:</b>\n");
+
+        var message = new SendMessage(chatId, tips.getTipsText() + res.toString());
+        message.enableHtml(true);
+        return message;
     }
 
     private SendMessage createDiseaseMessage(String chatId, Disease disease) {
@@ -53,19 +96,24 @@ public class UserMessageProcessor {
 
     private InlineKeyboardMarkup createDiseaseKeyboard(Disease disease) {
         return new InlineKeyboardMarkup(
-                List.of(List.of(createDiseaseButton(disease)))
+                List.of(createDiseaseButton(disease))
         );
     }
 
-    private InlineKeyboardButton createDiseaseButton(Disease disease) {
-        var button = new InlineKeyboardButton();
-        button.setText(disease.getName() + ": лечение");
-        button.setCallbackData("disease:" + disease.getCode());
-        return button;
+    private List<InlineKeyboardButton> createDiseaseButton(Disease disease) {
+        var adviceButton = new InlineKeyboardButton();
+        adviceButton.setText(disease.getName() + ": лечение");
+        adviceButton.setCallbackData(CALLBACK_PREFIX_DISEASE + disease.getCode());
+
+        var medicinesButton = new InlineKeyboardButton();
+        medicinesButton.setText("Препараты");
+        medicinesButton.setCallbackData(CALLBACK_PREFIX_MEDICINES + disease.getCode());
+
+        return List.of(adviceButton, medicinesButton);
     }
 
     // FIXME: Исправить кривую реализацию (TgBot <-> UserMessageProcessor)
-    public void setSender(TgSender sender) {
-        this.sender = sender;
+    public void setTgSender(TgSender tgSender) {
+        this.tgSender = tgSender;
     }
 }
