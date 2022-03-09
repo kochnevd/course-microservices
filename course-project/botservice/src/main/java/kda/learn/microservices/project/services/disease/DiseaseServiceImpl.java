@@ -3,6 +3,8 @@ package kda.learn.microservices.project.services.disease;
 import kda.learn.microservices.project.services.disease.model.Disease;
 import kda.learn.microservices.project.services.disease.model.TreatmentTips;
 import kda.learn.microservices.project.services.nlp.NlpSymptomsService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -11,6 +13,8 @@ import java.util.stream.Collectors;
 
 @Service
 public class DiseaseServiceImpl implements DiseaseService {
+
+    final Logger log = LoggerFactory.getLogger(DiseaseServiceImpl.class);
 
     private final NlpSymptomsService nlpSymptoms;
 
@@ -55,11 +59,17 @@ public class DiseaseServiceImpl implements DiseaseService {
     }
 
     private Disease findDisease(String code) {
-        return DISEASES
+        var res = DISEASES
                 .stream()
                 .filter(disease -> disease.getCode().equalsIgnoreCase(code))
-                .findAny()
-                .orElse(UNKNOWN_DISEASE);
+                .findAny();
+
+        if (res.isPresent())
+            return res.get();
+        else {
+            log.warn("Запрос с неизвестным кодом болезни ({})", code);
+            return UNKNOWN_DISEASE;
+        }
     }
 
     private List<Disease> loadDiseases() {
