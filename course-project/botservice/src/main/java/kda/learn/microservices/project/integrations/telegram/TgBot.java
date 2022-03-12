@@ -91,7 +91,7 @@ public class TgBot extends TelegramLongPollingCommandBot implements TgSender {
         // TODO: дубль с AbstractTextCommand.sendAnswer
         SendMessage message = new SendMessage();
         //включаем поддержку режима разметки, чтобы управлять отображением текста и добавлять эмодзи
-        message.enableMarkdownV2(true);
+        message.enableHtml(true);
         message.setChatId(chatId);
         message.setText(text);
         send(message);

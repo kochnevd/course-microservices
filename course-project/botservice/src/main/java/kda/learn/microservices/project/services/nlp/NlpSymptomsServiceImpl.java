@@ -1,10 +1,8 @@
 package kda.learn.microservices.project.services.nlp;
 
+import kda.learn.microservices.project.services.CommonFileUtils;
 import org.springframework.stereotype.Service;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -23,17 +21,9 @@ public class NlpSymptomsServiceImpl implements NlpSymptomsService {
 
     private static final long MAX_DISEASES_COUNT = 3;
 
-    private static String loadDataFile(String fileName) throws IOException {
-        ClassLoader loader = Thread.currentThread().getContextClassLoader();
-        try(InputStream inputStream = loader.getResourceAsStream(fileName)) {
-            if (inputStream == null) throw new IOException("Не удалось загрузить файл с данными " + fileName);
-            return new String(inputStream.readAllBytes(), StandardCharsets.UTF_8);
-        }
-    }
-
     private static Map<String, Set<String>> loadSymptomsData() {
         try {
-            String data = loadDataFile(SYMPTOMS_FILE);
+            String data = CommonFileUtils.loadDataFile(SYMPTOMS_FILE);
 
             Map<String, Set<String>> res = new HashMap<>();
             for (var line : data.split("\n")) {
@@ -55,7 +45,7 @@ public class NlpSymptomsServiceImpl implements NlpSymptomsService {
 
     private static Set<String> loadStopWords() {
         try {
-            String data = loadDataFile(STOP_WORDS_FILE);
+            String data = CommonFileUtils.loadDataFile(STOP_WORDS_FILE);
             return Arrays
                     .stream(data.split("\n"))
                     .map(s -> s.trim().toLowerCase())

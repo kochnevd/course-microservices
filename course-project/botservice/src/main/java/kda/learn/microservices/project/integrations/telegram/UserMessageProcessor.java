@@ -3,6 +3,7 @@ package kda.learn.microservices.project.integrations.telegram;
 import kda.learn.microservices.project.services.disease.DiseaseService;
 import kda.learn.microservices.project.services.disease.model.Disease;
 import kda.learn.microservices.project.services.disease.model.TreatmentTips;
+import kda.learn.microservices.project.services.drugs.DrugsService;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.AnswerCallbackQuery;
 import org.telegram.telegrambots.meta.api.methods.BotApiMethod;
@@ -12,6 +13,7 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMa
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 
 import java.util.List;
+import java.util.Locale;
 
 // TODO: вынести бизнес-логику в сервисный класс
 
@@ -21,11 +23,17 @@ public class UserMessageProcessor {
     public static final String CALLBACK_PREFIX_DISEASE = "disease:";
     public static final String CALLBACK_PREFIX_MEDICINES = "medicines:";
     private static final TreatmentTips TIPS_NOT_FOUND = new TreatmentTips("Советы по данной проблеме отсутствуют.");
+    private static final int MAX_DRUG_COUNT_SHOWN = 5;
+
+    private static final String DRUG_INFO_TEMPLATE = "<b>%s</b>\n%s";
+
     private final DiseaseService diseaseService;
+    private final DrugsService drugsService;
     private TgSender tgSender;
 
-    public UserMessageProcessor(DiseaseService diseaseService) {
+    public UserMessageProcessor(DiseaseService diseaseService, DrugsService drugsService) {
         this.diseaseService = diseaseService;
+        this.drugsService = drugsService;
     }
 
     public void processMessage(String chatId, String text) {
@@ -63,8 +71,21 @@ public class UserMessageProcessor {
     }
 
     private void showMedicines(String chatId, String diseaseCode) {
-        throw new RuntimeException("Not implemented");
-        // TODO: implement
+        var drugs = drugsService.drugsForDisease(diseaseCode);
+        if (drugs.isEmpty()) {
+            tgSender.send(chatId, "Простите, я пока не знаю лекарства от этой болезни " + Emoji.CONFUSED);
+            return;
+        }
+
+        tgSender.send(chatId, "Могу порекомендовать такие препараты");
+        for (int i = 0; i < drugs.size(); i++) {
+            if (i > MAX_DRUG_COUNT_SHOWN) break;
+
+            var drugInfo = drugs.get(i);
+            var text = String.format(DRUG_INFO_TEMPLATE, drugInfo.getName(), drugInfo.getInstructions());
+            tgSender.send(chatId, text);
+            // TODO: добавить кнопку для поиска в магазинах
+        }
     }
 
     private void showTreatmentTips(String chatId, String diseaseCode) {
