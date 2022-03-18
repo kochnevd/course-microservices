@@ -18,11 +18,12 @@ public class ShopsPricesCache implements ShopsSearchResultsReceiver {
     private final Logger log = LoggerFactory.getLogger(ShopsPricesCache.class);
 
     private final Map<String, ShopPrices> cache = new ConcurrentHashMap<>();
-    private final Map<String, List<Consumer<String>>> subscribers = new HashMap<>();
+    private final Map<String, List<Subscriber>> subscribers = new HashMap<>();
 
-    public void subscribeForDrug(String drug, Consumer<String> onDrugPricesReady) {
+    public void subscribeForDrug(String drug, String chatId, Consumer<String> onDrugPricesReady) {
         var drugSubscriberList = subscribers.computeIfAbsent(drug, k -> new ArrayList<>());
-        drugSubscriberList.add(onDrugPricesReady);
+        if (drugSubscriberList.stream().noneMatch(subscriber -> subscriber.charId.equals(chatId)))
+            drugSubscriberList.add(new Subscriber(chatId, onDrugPricesReady));
         if (cache.containsKey(drug)) // Данные поступили до подписки, можем сразу выдать
             onDrugPricesReady.accept(drug);
     }
@@ -41,7 +42,7 @@ public class ShopsPricesCache implements ShopsSearchResultsReceiver {
     private void notifySubscribers(String medicine) {
         var drugSubscribers = subscribers.get(medicine);
         if (drugSubscribers != null) {
-            drugSubscribers.forEach(consumer -> consumer.accept(medicine));
+            drugSubscribers.forEach(subscriber -> subscriber.eventConsumer.accept(medicine));
         }
     }
 
@@ -56,6 +57,16 @@ public class ShopsPricesCache implements ShopsSearchResultsReceiver {
 
         public ShopPrices(String priceInfo) {
             this.priceInfo = priceInfo;
+        }
+    }
+
+    private static class Subscriber {
+        String charId;
+        Consumer<String> eventConsumer;
+
+        public Subscriber(String charId, Consumer<String> eventConsumer) {
+            this.eventConsumer = eventConsumer;
+            this.charId = charId;
         }
     }
 }

@@ -99,7 +99,6 @@ public class UserMessageProcessor {
         } else if (data.startsWith(CALLBACK_PREFIX_REFRESH_SHOPS)) {
             var drug = data.substring(CALLBACK_PREFIX_REFRESH_SHOPS.length());
             checkInlineDrugMessages(chatId, messageId, drug); // На случай перезапуска бота надо обновить список inline-клавиатур
-            shopsService.startSearchInShops(drug, shopsPricesCache);
 
             tgSender.send(answerBuilder
                     .text("Опрашиваем партнеров в поисках препарата " + drug)
@@ -124,6 +123,9 @@ public class UserMessageProcessor {
                 .filter(inlineDrugMessage -> inlineDrugMessage.chatId.equals(chatId))
                 .noneMatch(inlineDrugMessage -> inlineDrugMessage.messageId.equals(messageId))) {
             allDrugMessages.inlineDrugMessages.add(new InlineDrugMessage(chatId, messageId));
+            // Кнопка с лекарством новая, нужно запустить поиск по магазинам для нее
+            shopsService.startSearchInShops(drug, shopsPricesCache);
+            shopsPricesCache.subscribeForDrug(drug, chatId, this::onDrugPricesReady); // На случай перезапуска бота надо снова подписаться
         }
         return allDrugMessages;
     }
@@ -161,7 +163,7 @@ public class UserMessageProcessor {
             tgSender.send(message);
             // запускаем поиск в магазинах, не дожидаясь нажатия на кнопку пользователем
             shopsService.startSearchInShops(drugInfo.getName(), shopsPricesCache);
-            shopsPricesCache.subscribeForDrug(drugInfo.getName(), this::onDrugPricesReady);
+            shopsPricesCache.subscribeForDrug(drugInfo.getName(), chatId, this::onDrugPricesReady);
         }
     }
 
