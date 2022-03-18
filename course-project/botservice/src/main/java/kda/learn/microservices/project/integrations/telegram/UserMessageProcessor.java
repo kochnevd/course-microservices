@@ -83,12 +83,11 @@ public class UserMessageProcessor {
 
         } else if (data.startsWith(CALLBACK_PREFIX_SHOPS)) {
             var drug = data.substring(CALLBACK_PREFIX_SHOPS.length());
-            var allDrugMessages = checkInlineDrugMessages(chatId, messageId, drug);
+            var inlineDrugMessage = checkInlineDrugMessages(chatId, messageId, drug);
 
-            var newShopsInfo = processIfPricesReady(chatId, messageId, drug, allDrugMessages.shopsInfo);
-            allDrugMessages.shopsInfo = newShopsInfo;
+            var pricesReady = processIfPricesReady(drug, inlineDrugMessage);
 
-            String alertText = newShopsInfo == null ?
+            String alertText = !pricesReady ?
                     "Опрашиваем партнеров в поисках препарата " + drug :
                     "Можно отображать аптеки с ценами!";
 
@@ -116,34 +115,39 @@ public class UserMessageProcessor {
                 .build());
     }
 
-    protected InlineDrugMessages checkInlineDrugMessages(String chatId, Integer messageId, String drug) {
-        var allDrugMessages = inlineDrugMessages.computeIfAbsent(drug, drugKey -> new InlineDrugMessages(drugKey, null));
-        if (allDrugMessages.inlineDrugMessages
+    private InlineDrugMessage checkInlineDrugMessages(String chatId, Integer messageId, String drug) {
+        var allDrugMessages = inlineDrugMessages.computeIfAbsent(drug, InlineDrugMessages::new);
+
+        var res = allDrugMessages.inlineDrugMessages
                 .stream()
-                .filter(inlineDrugMessage -> inlineDrugMessage.chatId.equals(chatId))
-                .noneMatch(inlineDrugMessage -> inlineDrugMessage.messageId.equals(messageId))) {
-            allDrugMessages.inlineDrugMessages.add(new InlineDrugMessage(chatId, messageId));
-            // Кнопка с лекарством новая, нужно запустить поиск по магазинам для нее
-            shopsService.startSearchInShops(drug, shopsPricesCache);
+                .filter(inlineDrugMessage -> inlineDrugMessage.match(chatId, messageId))
+                .findAny()
+                .orElse(null);
+        if (res == null) {
+            res = new InlineDrugMessage(chatId, messageId);
+            allDrugMessages.inlineDrugMessages.add(res);
             shopsPricesCache.subscribeForDrug(drug, chatId, this::onDrugPricesReady); // На случай перезапуска бота надо снова подписаться
         }
-        return allDrugMessages;
+        shopsService.startSearchInShops(drug, shopsPricesCache);
+
+        return res;
     }
 
-    private String processIfPricesReady(String chatId, Integer messageId, String drug, String lastShopsInfo) {
+    private boolean processIfPricesReady(String drug, InlineDrugMessage inlineDrugMessage) {
         var prices = shopsPricesCache.getPrices(drug);
         if (prices == null)
-            return null;
+            return false;
         else {
             // Попытка обновления на то же самое значение вызывает ошибку:
             //   Error editing message text: [400] Bad Request: message is not modified: specified new message content and reply markup are exactly the same as a current content and reply markup of the message
             var shopsInfo = "Здесь будет краткая информация по наличию и ценам..";
-            if (!shopsInfo.equals(lastShopsInfo)) {
+            if (!shopsInfo.equals(inlineDrugMessage.shopsInfo)) {
+                inlineDrugMessage.shopsInfo = shopsInfo;
                 // поменять вид кнопки
-                var message = updateDrugShopsMessage(chatId, messageId, drug, shopsInfo);
+                var message = updateDrugShopsMessage(inlineDrugMessage.chatId, inlineDrugMessage.messageId, drug, shopsInfo);
                 tgSender.send(message);
-            };
-            return shopsInfo;
+            }
+            return true;
         }
     }
 
@@ -173,11 +177,7 @@ public class UserMessageProcessor {
                 .stream()
                 .filter(inlineDrugMessages -> inlineDrugMessages.drug.equalsIgnoreCase(drug))
                 .forEach(inlineDrugMessages -> inlineDrugMessages.inlineDrugMessages.forEach(
-                        inlineDrugMessage -> processIfPricesReady(
-                                inlineDrugMessage.chatId,
-                                inlineDrugMessage.messageId,
-                                inlineDrugMessages.drug,
-                                inlineDrugMessages.shopsInfo)
+                        inlineDrugMessage -> processIfPricesReady(inlineDrugMessages.drug, inlineDrugMessage)
                 ));
     }
 
@@ -289,23 +289,26 @@ public class UserMessageProcessor {
     /////////////////////////////////////////////////////////
 
     private static class InlineDrugMessage {
-        public String chatId;
-        public Integer messageId;
+        private final String chatId;
+        private final Integer messageId;
+        private String shopsInfo;
 
         public InlineDrugMessage(String chatId, Integer messageId) {
             this.chatId = chatId;
             this.messageId = messageId;
         }
+
+        public boolean match(String chatId, Integer messageId) {
+            return this.chatId.equals(chatId) && this.messageId.equals(messageId);
+        }
     }
 
     private static class InlineDrugMessages {
         public String drug;
-        public String shopsInfo;
         private final List<InlineDrugMessage> inlineDrugMessages = new ArrayList<>();
 
-        public InlineDrugMessages(String drug, String shopsInfo) {
+        public InlineDrugMessages(String drug) {
             this.drug = drug;
-            this.shopsInfo = shopsInfo;
         }
     }
 }
