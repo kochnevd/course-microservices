@@ -2,12 +2,12 @@ package kda.learn.microservices.project.services.disease;
 
 import kda.learn.microservices.project.services.disease.model.Disease;
 import kda.learn.microservices.project.services.disease.model.TreatmentTips;
+import kda.learn.microservices.project.services.disease.repository.DiseaseStorage;
 import kda.learn.microservices.project.services.nlp.NlpSymptomsService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -17,12 +17,13 @@ public class DiseaseServiceImpl implements DiseaseService {
     final Logger log = LoggerFactory.getLogger(DiseaseServiceImpl.class);
 
     private final NlpSymptomsService nlpSymptoms;
+    private final DiseaseStorage diseaseStorage;
 
-    private final List<Disease> DISEASES = loadDiseases();
     private final Disease UNKNOWN_DISEASE = new Disease().code("unknown").name("Неопознанная болезнь");
 
-    public DiseaseServiceImpl(NlpSymptomsService nlpSymptoms) {
+    public DiseaseServiceImpl(NlpSymptomsService nlpSymptoms, DiseaseStorage diseaseStorage) {
         this.nlpSymptoms = nlpSymptoms;
+        this.diseaseStorage = diseaseStorage;
     }
 
     @Override
@@ -59,7 +60,7 @@ public class DiseaseServiceImpl implements DiseaseService {
     }
 
     private Disease findDisease(String code) {
-        var res = DISEASES
+        var res = diseaseStorage.getDiseases()
                 .stream()
                 .filter(disease -> disease.getCode().equalsIgnoreCase(code))
                 .findAny();
@@ -70,14 +71,5 @@ public class DiseaseServiceImpl implements DiseaseService {
             log.warn("Запрос с неизвестным кодом болезни ({})", code);
             return UNKNOWN_DISEASE;
         }
-    }
-
-    private List<Disease> loadDiseases() {
-        var res = new ArrayList<Disease>();
-
-        res.add(new Disease().code("headache").name("Мигрень").symptoms(List.of("Головная боль", "Тошнота")));
-        res.add(new Disease().code("toothache").name("Кариес").symptoms(List.of("Зубная боль")));
-
-        return res;
     }
 }
