@@ -19,7 +19,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Random;
 
 // TODO: вынести бизнес-логику в сервисный класс
 
@@ -31,7 +30,7 @@ public class UserMessageProcessor {
     public static final String CALLBACK_PREFIX_SHOPS = "shops:";
     public static final String CALLBACK_PREFIX_REFRESH_SHOPS = "refreshshops:";
     public static final String CALLBACK_PREFIX_SHOPPING = "shopping:";
-    private static final TreatmentTips TIPS_NOT_FOUND = new TreatmentTips("Советы по данной проблеме отсутствуют.");
+    private static final TreatmentTips TIPS_NOT_FOUND = new TreatmentTips(null, "Советы по данной проблеме отсутствуют.");
     private static final int MAX_DRUG_COUNT_SHOWN = 5;
 
     private static final String DRUG_INFO_TEMPLATE = "<b>%s</b>\n%s";

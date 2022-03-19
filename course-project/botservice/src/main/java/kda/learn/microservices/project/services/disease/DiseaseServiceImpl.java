@@ -37,26 +37,7 @@ public class DiseaseServiceImpl implements DiseaseService {
 
     @Override
     public TreatmentTips findTreatmentTips(String diseaseCode) {
-        if (diseaseCode.equals("headache")) {
-            var res = new TreatmentTips(
-                    "<b>Мигрень</b>\n" +
-                            "Лечение мигрени делится на два направления:\n" +
-                    "- облегчение состояния во время приступа;\n" +
-                    "- предупреждение новых приступов\n\n" +
-                    "Помощь при приступе:\n" +
-                            "- снижение шума, свежий воздух, постель\n" +
-                            "- обезболивающие препараты\n" +
-                            "- при необходимости противорвотные средства\n\n" +
-                    "Профилактика между приступами:\n" +
-                            "- антидепрессанты\n" +
-                            "- противосудорожные препараты\n" +
-                            "бета-адреноблокаторы (пропранолол и средства на его основе)");
-            res.addUrl("https://ru.wikipedia.org/wiki/Мигрень", "Мигрень - Википедия");
-            res.addUrl("https://7010303.ru/zabolevanija/migren/", "Мигрень: симптомы, причины, лечение");
-            return res;
-        }
-        else
-            return null;
+        return diseaseStorage.findTreatmentTips(diseaseCode);
     }
 
     private Disease findDisease(String code) {
