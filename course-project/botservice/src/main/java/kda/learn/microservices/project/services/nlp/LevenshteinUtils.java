@@ -38,22 +38,36 @@ import java.util.Map;
  */
 public final class LevenshteinUtils {
 
-    public static int smartDistance(String query, String sample) {
-        int distance;
-        if (sample.length() <= query.length()) {
-            distance = LevenshteinUtils.distance(query, sample);
-        } else {
-            int min_distance2 = Integer.MAX_VALUE;
-            // пробежим по строке словаря, сравнивая сэмпл с подстрокой такой же длины
-            for (int i = 0; i <= sample.length() - query.length(); i++) {
-                distance = LevenshteinUtils.distance(query, sample.substring(i, i + query.length()));
-                if (distance < min_distance2) {
-                    min_distance2 = distance;
-                }
-            }
-            distance = min_distance2;
+    /**
+     * Возвращает минимальное расстояние Левенштейна подстроки в строке либо NULL, если оно слишком большое.
+     * @param query Строка запроса
+     * @param sample Искомый сэмпл
+     * @return Расстояние Левенштейна подстроки в строке либо NULL, если оно слишком большое
+     */
+    public static Integer smartDistance(String query, String sample) {
+
+        // строки, отличающиеся слишком сильно, будем отбрасывать, предел определим через LOG2
+
+        int distance, maxDist;
+        int min_distance2 = Integer.MAX_VALUE;
+        if (sample.length() > query.length()) {
+            // Меняем местами, sample должен быть короче query
+            var buf = sample;
+            sample = query;
+            query = buf;
         }
-        return distance;
+
+        maxDist = (int) (Math.log(sample.length()) / Math.log(2));
+        // пробежим по строке словаря, сравнивая сэмпл с подстрокой такой же длины
+        for (int i = 0; i <= query.length() - sample.length(); i++) {
+            distance = LevenshteinUtils.distance(query.substring(i, i + sample.length()), sample);
+            if (distance < min_distance2) {
+                min_distance2 = distance;
+            }
+        }
+
+        distance = min_distance2;
+        return distance < maxDist ? distance : null;
     }
 
     public static int distance(CharSequence lhs, CharSequence rhs) {

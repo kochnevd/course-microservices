@@ -8,6 +8,7 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -61,15 +62,12 @@ public class NlpSymptomsServiceImpl implements NlpSymptomsService {
 
         var preprocessedText = preprocess(text);
 
-        // строки, отличающиеся слишком сильно, будем отбрасывать, предел определим через LOG2
-        int maxDist = (int) (Math.log(preprocessedText.length()) / Math.log(2));
-
         return SYMPTOMS.entrySet().stream()
                 .map(entry -> calcMinDist(preprocessedText, entry))
-                .filter(entry -> entry.getValue() < maxDist)
-                .sorted(Comparator.comparingInt(Map.Entry::getValue))
+                .filter(Objects::nonNull)
+                .sorted(Comparator.comparing(distanceEntry -> distanceEntry.distance))
                 .limit(MAX_DISEASES_COUNT)
-                .map(Map.Entry::getKey)
+                .map(distanceEntry -> distanceEntry.text)
                 .collect(Collectors.toList());
     }
 
@@ -88,12 +86,24 @@ public class NlpSymptomsServiceImpl implements NlpSymptomsService {
         return res;
     }
 
-    private Map.Entry<String, Integer> calcMinDist(String text, Map.Entry<String, Set<String>> entry) {
+    private DistanceEntry calcMinDist(String text, Map.Entry<String, Set<String>> entry) {
+        System.out.println();
         return entry.getValue()
                 .stream()
-                .map(symptom -> Map.entry(entry.getKey(), LevenshteinUtils.smartDistance(text, symptom)))
-                .min(Map.Entry.comparingByValue())
-                .get();
+                .map(symptom -> new DistanceEntry(entry.getKey(), LevenshteinUtils.smartDistance(text, symptom)))
+                .filter(distanceEntry -> distanceEntry.distance != null)
+                .min(Comparator.comparing(distanceEntry -> distanceEntry.distance))
+                .orElse(null);
         // TODO: кроме подбора по целой фразе можно добавить подбор по отдельным словам
+    }
+
+    private static class DistanceEntry {
+        private String text;
+        private Integer distance;
+
+        public DistanceEntry(String text, Integer distance) {
+            this.text = text;
+            this.distance = distance;
+        }
     }
 }
