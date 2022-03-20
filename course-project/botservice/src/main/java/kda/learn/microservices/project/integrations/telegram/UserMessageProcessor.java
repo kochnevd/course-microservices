@@ -23,6 +23,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.StringJoiner;
 
 // TODO: вынести бизнес-логику в сервисный класс
 
@@ -89,9 +90,9 @@ public class UserMessageProcessor {
             var drug = data.substring(CALLBACK_PREFIX_SHOPS.length());
             var inlineDrugMessage = checkInlineDrugMessages(chatId, messageId, drug);
 
-            var pricesReady = processIfPricesReady(drug, inlineDrugMessage);
+            var prices = processIfPricesReady(drug, inlineDrugMessage);
 
-            String alertText = !pricesReady ?
+            String alertText = prices == null ?
                     "Опрашиваем партнеров в поисках препарата " + drug :
                     "Можно отображать аптеки с ценами!";
 
@@ -108,11 +109,35 @@ public class UserMessageProcessor {
                     .build());
 
         } else if (data.startsWith(CALLBACK_PREFIX_SHOPPING)) {
+            var drug = data.substring(CALLBACK_PREFIX_SHOPPING.length());
+            var prices = shopsPricesCache.getPrices(drug);
 
+            String alertText;
+            boolean showAlert;
+            if (prices == null) {
+                alertText = "Информация по ценам недоступна, попробуйте обновить данные";
+                showAlert = false;
+            }
+            else if (prices.size() == 0){
+                alertText = "К сожалению, препарат отсутствует в продаже, попробуйте зайти позже..";
+                showAlert = false;
+            }
+            else {
+                StringJoiner pricesInfo = new StringJoiner("\n");
+                pricesInfo.add("Список аптек, где можно купить " + drug + ":");
+                pricesInfo.add("");
+                prices.forEach(shopPrice -> pricesInfo.add(String.format("%s: %s",
+                        shopPrice.getShop(),
+                        priceFormatter.format(shopPrice.getPrice()))));
+                pricesInfo.add("");
+                pricesInfo.add("Можно переходить к покупкам");
+                alertText = pricesInfo.toString();
+                showAlert = true;
+            }
             tgSender.send(answerBuilder
-                    .text("Можно переходить к покупкам")
+                    .text(alertText)
+                    .showAlert(showAlert)
                     .build());
-
         } else tgSender.send(answerBuilder
                 .text("Неизвестный код запроса: " + data)
                 .showAlert(true)
@@ -137,11 +162,9 @@ public class UserMessageProcessor {
         return res;
     }
 
-    private boolean processIfPricesReady(String drug, InlineDrugMessage inlineDrugMessage) {
+    private Set<ShopPrice> processIfPricesReady(String drug, InlineDrugMessage inlineDrugMessage) {
         var prices = shopsPricesCache.getPrices(drug);
-        if (prices == null)
-            return false;
-        else {
+        if (prices != null) {
             // Попытка обновления на то же самое значение вызывает ошибку:
             //   Error editing message text: [400] Bad Request: message is not modified: specified new message content and reply markup are exactly the same as a current content and reply markup of the message
             String shopsInfo;
@@ -164,8 +187,8 @@ public class UserMessageProcessor {
                 var message = updateDrugShopsMessage(inlineDrugMessage.chatId, inlineDrugMessage.messageId, drug, shopsInfo);
                 tgSender.send(message);
             }
-            return true;
         }
+        return prices;
     }
 
     private String getCorrectShopWord(int shopsCount) {
