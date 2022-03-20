@@ -9,7 +9,10 @@ package kda.learn.microservices.project.integrations.telegram;
 
 public enum Emoji {
     CONFUSED("\ud83d\ude15"),
-    SAD("\ud83d\ude14");
+    SAD("\ud83d\ude14"),
+    THINK("\ud83e\udd14"),
+    SCREAM("\ud83d\ude31"),
+    EYEBROW("\ud83e\udd28");
 
     private final String code;
 

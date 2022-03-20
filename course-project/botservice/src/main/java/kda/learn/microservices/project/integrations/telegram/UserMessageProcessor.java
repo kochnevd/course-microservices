@@ -22,6 +22,7 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 import java.util.Set;
 import java.util.StringJoiner;
 
@@ -58,7 +59,22 @@ public class UserMessageProcessor {
 
     public void processMessage(String chatId, String text) {
         var diseases = diseaseService.guessDisease(text);
-        for (var disease : diseases) {
+        if (diseases.isEmpty()) {
+            String message;
+            switch (new Random(System.currentTimeMillis()).nextInt(3)) {
+                case 0:
+                    message = "Да что вы говорите? " + Emoji.SCREAM + " Жалко я в этом не разбираюсь, а то бы что-нибудь посоветовал. Спросите еще что-нибудь, может догадаюсь?";
+                    break;
+                case 1:
+                    message = "Как интересно, что бы это могло быть? " + Emoji.THINK + " Ума не приложу, можете дать подсказку?";
+                    break;
+                default:
+                    message = "М-да, сложный случай... " + Emoji.EYEBROW + " Лучше спросите что-то попроще.";
+                    break;
+            }
+            tgSender.send(chatId, message);
+        }
+        else for (var disease : diseases) {
             tgSender.send(createDiseaseMessage(chatId, disease));
         }
     }
