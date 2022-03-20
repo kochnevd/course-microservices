@@ -8,7 +8,8 @@ package kda.learn.microservices.project.integrations.telegram;
  */
 
 public enum Emoji {
-    CONFUSED("\ud83d\ude15");
+    CONFUSED("\ud83d\ude15"),
+    SAD("\ud83d\ude14");
 
     private final String code;
 

@@ -6,6 +6,7 @@ import kda.learn.microservices.project.services.disease.model.TreatmentTips;
 import kda.learn.microservices.project.services.drugs.DrugsService;
 import kda.learn.microservices.project.services.drugs.model.DrugInfo;
 import kda.learn.microservices.project.services.shops.ShopsService;
+import kda.learn.microservices.project.services.shops.dto.ShopPrice;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.AnswerCallbackQuery;
 import org.telegram.telegrambots.meta.api.methods.BotApiMethod;
@@ -15,10 +16,13 @@ import org.telegram.telegrambots.meta.api.objects.CallbackQuery;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 
+import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 // TODO: вынести бизнес-логику в сервисный класс
 
@@ -34,6 +38,7 @@ public class UserMessageProcessor {
     private static final int MAX_DRUG_COUNT_SHOWN = 5;
 
     private static final String DRUG_INFO_TEMPLATE = "<b>%s</b>\n%s";
+    private static final DecimalFormat priceFormatter = new DecimalFormat("0.00");
 
     private final DiseaseService diseaseService;
     private final DrugsService drugsService;
@@ -139,7 +144,20 @@ public class UserMessageProcessor {
         else {
             // Попытка обновления на то же самое значение вызывает ошибку:
             //   Error editing message text: [400] Bad Request: message is not modified: specified new message content and reply markup are exactly the same as a current content and reply markup of the message
-            var shopsInfo = "Здесь будет краткая информация по наличию и ценам..";
+            String shopsInfo;
+            var shopsCount = prices.size();
+            if (shopsCount == 0)
+                shopsInfo = "К сожалению, в настоящее время " + drug  + " в продаже отсутствует " + Emoji.SAD;
+            else {
+                var minPrice = prices.stream().min(Comparator.comparingDouble(ShopPrice::getPrice)).get().getPrice();
+                var maxPrice = prices.stream().max(Comparator.comparingDouble(ShopPrice::getPrice)).get().getPrice();
+                shopsInfo = String.format("Найдено <u>в %d %s</u>\n" +
+                        "<i>Минимальная цена: <b>%s</b></i>\n" +
+                        "<i>Максимальная цена: <b>%s</b></i>",
+                        shopsCount, getCorrectShopWord(shopsCount), priceFormatter.format(minPrice), priceFormatter.format(maxPrice));
+            }
+
+
             if (!shopsInfo.equals(inlineDrugMessage.shopsInfo)) {
                 inlineDrugMessage.shopsInfo = shopsInfo;
                 // поменять вид кнопки
@@ -148,6 +166,13 @@ public class UserMessageProcessor {
             }
             return true;
         }
+    }
+
+    private String getCorrectShopWord(int shopsCount) {
+        if (shopsCount % 10 == 1 && shopsCount != 11)
+            return "аптеке";
+        else
+            return "аптеках";
     }
 
     private void showMedicines(String chatId, String diseaseCode) {
