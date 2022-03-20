@@ -201,7 +201,8 @@ public class UserMessageProcessor {
     private void showMedicines(String chatId, String diseaseCode) {
         var drugs = drugsService.drugsForDisease(diseaseCode);
         if (drugs.isEmpty()) {
-            tgSender.send(chatId, "Простите, я пока не знаю лекарства от этой болезни " + Emoji.CONFUSED);
+            tgSender.send(chatId, "Простите, я пока не знаю лекарства от этой болезни " + Emoji.CONFUSED +
+                    "\nМожете посмотреть советы по лечению.");
             return;
         }
 

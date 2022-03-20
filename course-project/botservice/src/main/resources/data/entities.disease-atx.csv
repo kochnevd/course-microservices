@@ -1,3 +1,7 @@
 headache;N02B
 toothache;N02B
 diarrhea;A07BC05,A07DA03
+back;M01A
+injury;M01A
+allergy;R06
+orvi;N02BE;

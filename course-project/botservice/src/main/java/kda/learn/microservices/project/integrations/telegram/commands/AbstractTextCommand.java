@@ -1,5 +1,7 @@
 package kda.learn.microservices.project.integrations.telegram.commands;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.telegram.telegrambots.extensions.bots.commandbot.commands.BotCommand;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Chat;
@@ -8,6 +10,8 @@ import org.telegram.telegrambots.meta.bots.AbsSender;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 public abstract class AbstractTextCommand extends BotCommand {
+
+    private final Logger log = LoggerFactory.getLogger(this.getClass());
 
     public AbstractTextCommand(String commandIdentifier, String description) {
         super(commandIdentifier, description);
@@ -38,7 +42,7 @@ public abstract class AbstractTextCommand extends BotCommand {
         try {
             absSender.execute(message);
         } catch (TelegramApiException e) {
-            //TODO: логируем сбой Telegram Bot API, используя commandName и userName
+            log.error("сбой Telegram Bot API", e);
         }
     }
 }
