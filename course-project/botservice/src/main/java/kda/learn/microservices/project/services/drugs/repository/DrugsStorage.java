@@ -6,4 +6,5 @@ import java.util.List;
 
 public interface DrugsStorage {
     List<DrugEntity> getDrugsByDisease(String diseaseCode);
+    List<DrugEntity> getDrugsByName(String drugName);
 }

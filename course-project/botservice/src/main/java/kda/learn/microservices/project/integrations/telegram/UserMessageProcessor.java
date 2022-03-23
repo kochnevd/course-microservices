@@ -73,6 +73,15 @@ public class UserMessageProcessor {
     }
 
     public void processMessage(String chatId, String text) {
+        if (!processMessageAsDrugName(chatId, text))
+            processMessageAsSymptomsText(chatId, text);
+    }
+
+    private boolean processMessageAsDrugName(String chatId, String text) {
+        return showMedicinesByDrugName(chatId, text);
+    }
+
+    private void processMessageAsSymptomsText(String chatId, String text) {
         counterNlpCalls.increment();
         var diseases = diseaseService.guessDisease(text);
         if (diseases.isEmpty()) {
@@ -117,7 +126,7 @@ public class UserMessageProcessor {
             tgSender.send(answerBuilder
                     .text("Загружаем список препаратов")
                     .build());
-            showMedicines(chatId, diseaseCode);
+            showMedicinesByDiseaseCode(chatId, diseaseCode);
 
         } else if (data.startsWith(CALLBACK_PREFIX_SHOPS)) {
             var drug = data.substring(CALLBACK_PREFIX_SHOPS.length());
@@ -235,7 +244,16 @@ public class UserMessageProcessor {
             return "аптеках";
     }
 
-    private void showMedicines(String chatId, String diseaseCode) {
+    private boolean showMedicinesByDrugName(String chatId, String drugName) {
+        var drugs = drugsService.findDrugs(drugName);
+        if (drugs.isEmpty()) return false;
+
+        var titleMessage = drugs.size() == 1 ? null : "Я нашел препараты с похожим названием:";
+        ShowMedicines(chatId, drugs, titleMessage);
+        return true;
+    }
+
+    private void showMedicinesByDiseaseCode(String chatId, String diseaseCode) {
         var drugs = drugsService.drugsForDisease(diseaseCode);
         if (drugs.isEmpty()) {
             tgSender.send(chatId, "Простите, я пока не знаю лекарства от этой болезни " + Emoji.CONFUSED +
@@ -243,7 +261,11 @@ public class UserMessageProcessor {
             return;
         }
 
-        tgSender.send(chatId, "Могу порекомендовать такие препараты");
+        ShowMedicines(chatId, drugs, "Могу порекомендовать такие препараты");
+    }
+
+    private void ShowMedicines(String chatId, List<DrugInfo> drugs, String titleMessage) {
+        if (titleMessage != null) tgSender.send(chatId, titleMessage);
         for (int i = 0; i < drugs.size(); i++) {
             if (i > MAX_DRUG_COUNT_SHOWN) break;
 

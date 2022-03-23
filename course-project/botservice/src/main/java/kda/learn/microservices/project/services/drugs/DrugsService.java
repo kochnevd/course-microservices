@@ -6,4 +6,6 @@ import java.util.List;
 
 public interface DrugsService {
     List<DrugInfo> drugsForDisease(String diseaseCode);
+
+    List<DrugInfo> findDrugs(String drug);
 }

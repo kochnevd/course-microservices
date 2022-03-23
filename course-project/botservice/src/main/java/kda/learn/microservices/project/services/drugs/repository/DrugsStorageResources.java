@@ -75,13 +75,6 @@ public class DrugsStorageResources implements DrugsStorage {
 
     @Override
     public List<DrugEntity> getDrugsByDisease(String diseaseCode) {
-//        var filterByDiseaseCode = DISEASE_ATX_ENTITIES.stream()
-//                .filter(diseaseAtxEntity -> diseaseAtxEntity.getDiseaseCode().equalsIgnoreCase(diseaseCode));
-//
-//        var filterByAtx = DRUG_ENTITIES.stream()
-//                .filter(drugEntity -> filterByDiseaseCode.anyMatch(
-//                        diseaseAtxEntity -> diseaseAtxEntity.getDiseaseCode().equalsIgnoreCase(drugEntity.getAtxCode())));
-
         var filterByAtx = DRUG_ENTITIES.stream()
                 .filter(drugEntity -> {
                     for (DiseaseAtxEntity diseaseAtxEntity : DISEASE_ATX_ENTITIES) {
@@ -95,5 +88,13 @@ public class DrugsStorageResources implements DrugsStorage {
                 });
 
         return filterByAtx.collect(Collectors.toList());
+    }
+
+    @Override
+    public List<DrugEntity> getDrugsByName(String drugName) {
+        var regexp = drugName.replace("*", ".*").toLowerCase();
+        return DRUG_ENTITIES.stream()
+                .filter(drugEntity -> drugEntity.getName().toLowerCase().matches(regexp))
+                .collect(Collectors.toList());
     }
 }

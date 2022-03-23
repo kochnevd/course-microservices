@@ -25,6 +25,14 @@ public class DrugsServiceImpl implements DrugsService {
                 .collect(Collectors.toList());
     }
 
+    @Override
+    public List<DrugInfo> findDrugs(String drug) {
+        return drugsStorage.getDrugsByName(drug)
+                .stream()
+                .map(this::transform)
+                .collect(Collectors.toList());
+    }
+
     private DrugInfo transform(DrugEntity drugEntity) {
         return new DrugInfo()
                 .atx(drugEntity.getAtxCode())
