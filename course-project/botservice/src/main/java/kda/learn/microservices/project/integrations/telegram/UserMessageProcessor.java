@@ -1,5 +1,7 @@
 package kda.learn.microservices.project.integrations.telegram;
 
+import io.micrometer.core.instrument.Counter;
+import io.micrometer.core.instrument.MeterRegistry;
 import kda.learn.microservices.project.services.disease.DiseaseService;
 import kda.learn.microservices.project.services.disease.model.Disease;
 import kda.learn.microservices.project.services.disease.model.TreatmentTips;
@@ -46,20 +48,35 @@ public class UserMessageProcessor {
     private final DrugsService drugsService;
     private final ShopsService shopsService;
     private final ShopsPricesCache shopsPricesCache;
+    private final Counter counterTipsAsks;
+    private final Counter counterTipsNotFound;
+    private final Counter counterNlpCalls;
+    private final Counter counterNlpMisunderstands;
+    private final Map<String, Counter> countersDrugAbsentInShops = new HashMap<>();
+    private final MeterRegistry registry;
     private TgSender tgSender;
 
     private final Map<String, InlineDrugMessages> inlineDrugMessages = new HashMap<>();
 
-    public UserMessageProcessor(DiseaseService diseaseService, DrugsService drugsService, ShopsService shopsService, ShopsPricesCache shopsPricesCache) {
+    public UserMessageProcessor(DiseaseService diseaseService, DrugsService drugsService, ShopsService shopsService, ShopsPricesCache shopsPricesCache,
+                                MeterRegistry registry) {
         this.diseaseService = diseaseService;
         this.drugsService = drugsService;
         this.shopsService = shopsService;
         this.shopsPricesCache = shopsPricesCache;
+
+        this.registry = registry;
+        counterNlpCalls = registry.counter("Nlp-calls");
+        counterNlpMisunderstands = registry.counter("Nlp-misunderstands");
+        counterTipsAsks = registry.counter("Tips-asks");
+        counterTipsNotFound = registry.counter("Tips-not-found");
     }
 
     public void processMessage(String chatId, String text) {
+        counterNlpCalls.increment();
         var diseases = diseaseService.guessDisease(text);
         if (diseases.isEmpty()) {
+            counterNlpMisunderstands.increment();
             String message;
             switch (new Random(System.currentTimeMillis()).nextInt(3)) {
                 case 0:
@@ -185,9 +202,13 @@ public class UserMessageProcessor {
             //   Error editing message text: [400] Bad Request: message is not modified: specified new message content and reply markup are exactly the same as a current content and reply markup of the message
             String shopsInfo;
             var shopsCount = prices.size();
-            if (shopsCount == 0)
-                shopsInfo = "К сожалению, в настоящее время " + drug  + " в продаже отсутствует " + Emoji.SAD;
-            else {
+            if (shopsCount == 0) {
+                shopsInfo = "К сожалению, в настоящее время " + drug + " в продаже отсутствует " + Emoji.SAD;
+                countersDrugAbsentInShops.computeIfAbsent(
+                        drug,
+                        s -> Counter.builder("Drug-absent-in-shops").tag("drug", s).register(registry))
+                    .increment();
+            } else {
                 var minPrice = prices.stream().min(Comparator.comparingDouble(ShopPrice::getPrice)).get().getPrice();
                 var maxPrice = prices.stream().max(Comparator.comparingDouble(ShopPrice::getPrice)).get().getPrice();
                 shopsInfo = String.format("Найдено <u>в %d %s</u>\n" +
@@ -301,8 +322,12 @@ public class UserMessageProcessor {
     /////////////////////////////////////////////////////////
 
     private void showTreatmentTips(String chatId, String diseaseCode) {
+        counterTipsAsks.increment();
         var tips = diseaseService.findTreatmentTips(diseaseCode);
-        if (tips == null) tips = TIPS_NOT_FOUND;
+        if (tips == null) {
+            tips = TIPS_NOT_FOUND;
+            counterTipsNotFound.increment();
+        }
         tgSender.send(getTipsFormattedMessage(chatId, tips));
     }
 
